@@ -4,20 +4,18 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Send, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import { supabase } from "@/lib/supabase"; // To be uncommented when Supabase is configured
+import { supabase } from "@/lib/supabase";
 
-export function BookingForm() {
+export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("Voice Call - 10 Min (₹85)");
+  const [selectedPlan, setSelectedPlan] = useState(defaultPlan || "Voice Call - 10 Min (₹85)");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate network request or Supabase submission
-    /*
     const formData = new FormData(e.currentTarget);
     const { error } = await supabase.from('bookings').insert([
       { 
@@ -27,14 +25,18 @@ export function BookingForm() {
         question: formData.get('question') 
       }
     ]);
-    */
     
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      // Reset form after 3 seconds
-      setTimeout(() => setSuccess(false), 3000);
-    }, 1500);
+    setLoading(false);
+    
+    if (error) {
+      console.error('Error submitting booking:', error);
+      alert('There was an error submitting your request. Please try again.');
+      return;
+    }
+    
+    setSuccess(true);
+    // Reset form after 3 seconds
+    setTimeout(() => setSuccess(false), 3000);
   };
 
   return (

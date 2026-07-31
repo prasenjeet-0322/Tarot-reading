@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const initialTestimonials = [
   {
@@ -27,12 +28,47 @@ export function TestimonialsSection() {
   const [showForm, setShowForm] = useState(false);
   const [newReview, setNewReview] = useState({ name: "", review: "", rating: 5 });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchReviews = async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (data && data.length > 0) {
+        // We can prepend the fetched reviews to the initial ones, or just use fetched.
+        // For now, let's prepend them to initial ones to always have some content.
+        setTestimonials([...data, ...initialTestimonials]);
+      }
+    };
+    
+    fetchReviews();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReview.name || !newReview.review) return;
     
-    // Simulate submission and add to UI
+    setLoading(true);
+    
+    const { error } = await supabase.from('reviews').insert([
+      {
+        name: newReview.name,
+        review: newReview.review,
+        rating: newReview.rating
+      }
+    ]);
+    
+    setLoading(false);
+    
+    if (error) {
+      console.error('Error submitting review:', error);
+      alert('Failed to submit review. Please try again.');
+      return;
+    }
+    
     setTestimonials([{...newReview}, ...testimonials]);
     setSubmitted(true);
     setTimeout(() => {
@@ -147,9 +183,10 @@ export function TestimonialsSection() {
                     
                     <button 
                       type="submit"
-                      className="mt-4 px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all"
+                      disabled={loading}
+                      className="mt-4 px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all disabled:opacity-70"
                     >
-                      Submit Review
+                      {loading ? "Submitting..." : "Submit Review"}
                     </button>
                   </form>
                 )}

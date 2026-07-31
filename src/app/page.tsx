@@ -2,7 +2,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { Header } from "@/components/Header";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { PricingSection } from "@/components/PricingSection";
-import { BookingSection } from "@/components/BookingSection";
+
 
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { InstagramSection } from "@/components/InstagramSection";
@@ -18,7 +18,7 @@ export default function Home() {
       <HeroSection />
       <HowItWorksSection />
       <PricingSection />
-      <BookingSection />
+
 
       <TestimonialsSection />
       <InstagramSection />

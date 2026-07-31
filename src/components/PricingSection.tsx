@@ -3,8 +3,11 @@
 import { motion } from "framer-motion";
 import { CheckCircle2, Sparkles, PhoneCall, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBooking } from "@/context/BookingContext";
 
 export function PricingSection() {
+  const { openBooking } = useBooking();
+
   return (
     <section id="pricing" className="py-12 bg-gradient-to-b from-[#151233]/80 to-[#0D0B1E]/80 relative">
       <div className="max-w-5xl mx-auto px-4 relative z-10">
@@ -66,7 +69,10 @@ export function PricingSection() {
               </div>
             </div>
 
-            <button className="w-full py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:scale-105">
+            <button 
+              onClick={() => openBooking()}
+              className="w-full py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:scale-105"
+            >
               Book a Call
             </button>
           </motion.div>
@@ -107,7 +113,10 @@ export function PricingSection() {
               </ul>
             </div>
 
-            <button className="w-full py-3 rounded-xl font-medium transition-all duration-300 bg-white/10 text-white hover:bg-[#7B2FF7] hover:shadow-[0_0_20px_rgba(123,47,247,0.4)] mt-auto">
+            <button 
+              onClick={() => openBooking()}
+              className="w-full py-3 rounded-xl font-medium transition-all duration-300 bg-white/10 text-white hover:bg-[#7B2FF7] hover:shadow-[0_0_20px_rgba(123,47,247,0.4)] mt-auto"
+            >
               Request Reading
             </button>
           </motion.div>

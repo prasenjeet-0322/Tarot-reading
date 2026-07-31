@@ -4,10 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useBooking } from "@/context/BookingContext";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { openBooking } = useBooking();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,7 +62,7 @@ export function Header() {
               </button>
             ))}
             <button 
-              onClick={() => scrollTo('#booking')}
+              onClick={() => openBooking()}
               className="px-5 py-2 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold text-sm rounded-full hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all"
             >
               Book Reading
@@ -113,7 +115,7 @@ export function Header() {
                 </button>
               ))}
               <button 
-                onClick={() => scrollTo('#booking')}
+                onClick={() => { setMobileMenuOpen(false); openBooking(); }}
                 className="mt-8 px-8 py-4 w-full max-w-xs bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold text-lg rounded-full shadow-[0_0_20px_rgba(212,175,55,0.3)]"
               >
                 Book Reading

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Sparkles, Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useBooking } from "@/context/BookingContext";
 
 const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title: string; delay: number; backTitle: string; backDesc: string; defaultZIndex: number }) => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -53,6 +54,7 @@ const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title
 
 export function HeroSection() {
   const [mounted, setMounted] = useState(false);
+  const { openBooking } = useBooking();
 
   useEffect(() => {
     setMounted(true);
@@ -156,7 +158,8 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 1.2 }}
             whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(212, 175, 55, 0.6)" }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold text-base rounded-full relative overflow-hidden group border border-[#F5F0E6]/50"
+            onClick={() => openBooking()}
+            className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold text-base rounded-full relative overflow-hidden group border border-[#F5F0E6]/50 cursor-pointer"
           >
             <span className="relative z-10">Get Your Reading</span>
             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
