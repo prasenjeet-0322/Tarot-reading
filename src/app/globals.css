@@ -1,26 +1,33 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: #0D0B1E;
+  --color-foreground: #F5F0E6;
+  
+  --color-mystic-purple: #7B2FF7;
+  --color-mystic-purple-light: #9B63F8;
+  --color-mystic-purple-dark: #5816C7;
+  
+  --color-accent-gold: #D4AF37;
+  --color-accent-gold-light: #E8CC6F;
+  --color-accent-gold-dark: #A68625;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+/* Glassmorphism utilities */
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  .glass-card {
+    @apply bg-[#151233]/70 backdrop-blur-lg border border-[#7B2FF7]/30 shadow-[0_4px_30px_rgba(0,0,0,0.5)];
+  }
 }
