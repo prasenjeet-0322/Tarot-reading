@@ -37,9 +37,8 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
     setLoading(false);
     
     if (error) {
-      console.error('Error submitting booking:', error);
-      alert('There was an error submitting your request. Please try again.');
-      return;
+      console.error('Error submitting booking to database:', error);
+      // We continue to WhatsApp even if database fails so the lead is not lost
     }
     
     setSuccess(true);
