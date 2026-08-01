@@ -141,21 +141,21 @@ export function HeroSection() {
         {/* Left Side: Text */}
         <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left pt-0">
           <motion.h1 
-            variants={containerVariants}
+            variants={containerVariants as any}
             initial="hidden"
             animate="visible"
             className="font-serif text-5xl md:text-6xl lg:text-7xl font-medium text-transparent bg-clip-text bg-gradient-to-b from-[#F5F0E6] to-[#E8CC6F]/80 mb-6 drop-shadow-lg leading-tight flex flex-col items-center lg:items-start"
           >
             <div>
             {headingText1.map((word, i) => (
-              <motion.span key={i} variants={wordVariants} className="inline-block mr-2 md:mr-3">
+              <motion.span key={i} variants={wordVariants as any} className="inline-block mr-2 md:mr-3">
                 {word}
               </motion.span>
             ))}
             </div>
             <div className="mt-2 text-center lg:text-left">
               {headingText2.map((word, i) => (
-                <motion.span key={i} variants={wordVariants} className="inline-block italic text-[#D4AF37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] mr-2 md:mr-3">
+                <motion.span key={i} variants={wordVariants as any} className="inline-block italic text-[#D4AF37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] mr-2 md:mr-3">
                   {word}
                 </motion.span>
               ))}
