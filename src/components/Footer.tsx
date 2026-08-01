@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Moon, Sparkles } from "lucide-react";
+import { Moon, Sparkles } from "lucide-react";
 import { FaInstagram } from "react-icons/fa";
 
 export function Footer() {

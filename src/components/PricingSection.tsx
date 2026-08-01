@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Sparkles, PhoneCall, ScrollText } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CheckCircle2, PhoneCall, ScrollText } from "lucide-react";
 import { useBooking } from "@/context/BookingContext";
 
 export function PricingSection() {

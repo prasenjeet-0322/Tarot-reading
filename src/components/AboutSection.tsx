@@ -52,18 +52,18 @@ export function AboutSection() {
             </h2>
             <div className="space-y-6 text-gray-300 font-light leading-relaxed">
               <p>
-                Welcome, seeker. I am an intuitive tarot reader dedicated to helping you navigate life's unseen paths. Through the ancient wisdom of the cards, I channel cosmic energy to bring you clarity and peace.
+                Welcome, seeker. I am an intuitive tarot reader dedicated to helping you navigate life&apos;s unseen paths. Through the ancient wisdom of the cards, I channel cosmic energy to bring you clarity and peace.
               </p>
               <p>
                 My journey with tarot began as a personal quest for meaning and has blossomed into a lifelong calling. I believe that the future is not set in stone, but rather a tapestry of possibilities waiting to be woven by your choices.
               </p>
               <p>
-                Whether you're facing a crossroads in love, career, or personal growth, I am here to illuminate the shadows and empower you to step into your highest potential.
+                Whether you&apos;re facing a crossroads in love, career, or personal growth, I am here to illuminate the shadows and empower you to step into your highest potential.
               </p>
             </div>
             
             <div className="mt-8 font-serif text-2xl italic text-[#D4AF37]">
-              "The stars speak to those who listen."
+              &quot;The stars speak to those who listen.&quot;
             </div>
           </motion.div>
 

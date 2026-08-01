@@ -32,7 +32,7 @@ export function TestimonialsSection() {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('reviews')
         .select('*')
         .order('created_at', { ascending: false });
@@ -211,11 +211,11 @@ export function TestimonialsSection() {
                   <Star key={i} className="w-5 h-5 fill-[#D4AF37] text-[#D4AF37]" />
                 ))}
               </div>
-              <p className="text-gray-300 italic mb-6 leading-relaxed font-light">"{t.review}"</p>
+              <p className="text-gray-300 italic mb-6 leading-relaxed font-light">&quot;{t.review}&quot;</p>
               <div className="font-serif text-white font-medium">— {t.name}</div>
               
               <div className="absolute top-4 right-6 text-6xl font-serif text-[#7B2FF7]/10 pointer-events-none">
-                "
+                &quot;
               </div>
             </motion.div>
           ))}
@@ -245,11 +245,11 @@ export function TestimonialsSection() {
                     <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
                   ))}
                 </div>
-                <p className="text-gray-300 italic mb-4 leading-relaxed font-light text-sm">"{t.review}"</p>
+                <p className="text-gray-300 italic mb-4 leading-relaxed font-light text-sm">&quot;{t.review}&quot;</p>
                 <div className="font-serif text-white font-medium text-sm">— {t.name}</div>
                 
                 <div className="absolute top-4 right-4 text-4xl font-serif text-[#7B2FF7]/10 pointer-events-none">
-                  "
+                  &quot;
                 </div>
               </div>
             ))}

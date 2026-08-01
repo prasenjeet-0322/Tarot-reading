@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Sparkles, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useBooking } from "@/context/BookingContext";
@@ -54,16 +54,36 @@ const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title
 
 export function HeroSection() {
   const [mounted, setMounted] = useState(false);
+  const [heroStars, setHeroStars] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    opacity: number;
+    scale: number;
+    yAnim: (number | null)[];
+    duration: number;
+  }>>([]);
   const { openBooking } = useBooking();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
+    const newStars = [...Array(40)].map((_, i) => ({
+      id: i,
+      x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+      y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+      opacity: Math.random() * 0.5 + 0.2,
+      scale: Math.random() * 0.5 + 0.5,
+      yAnim: [null, Math.random() * -100 - 50],
+      duration: Math.random() * 10 + 10,
+    }));
+    setHeroStars(newStars);
   }, []);
 
   const headingText1 = "Unlock the Secrets".split(" ");
   const headingText2 = "Written in the Stars".split(" ");
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -74,7 +94,7 @@ export function HeroSection() {
     },
   };
 
-  const wordVariants = {
+  const wordVariants: Variants = {
     hidden: { opacity: 0, y: 20, filter: "blur(8px)" },
     visible: {
       opacity: 1,
@@ -92,23 +112,23 @@ export function HeroSection() {
       {/* Local Hero Stars for density */}
       {mounted && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(40)].map((_, i) => (
+          {heroStars.map((star) => (
             <motion.div
-              key={i}
+              key={star.id}
               className="absolute w-1 h-1 bg-white rounded-full"
               initial={{
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-                opacity: Math.random() * 0.5 + 0.2,
-                scale: Math.random() * 0.5 + 0.5,
+                x: star.x,
+                y: star.y,
+                opacity: star.opacity,
+                scale: star.scale,
               }}
               animate={{
-                y: [null, Math.random() * -100 - 50],
+                y: star.yAnim,
                 opacity: [null, 1, 0],
                 boxShadow: ["0 0 0px #fff", "0 0 10px #D4AF37", "0 0 0px #fff"],
               }}
               transition={{
-                duration: Math.random() * 10 + 10,
+                duration: star.duration,
                 repeat: Infinity,
                 ease: "linear",
               }}
