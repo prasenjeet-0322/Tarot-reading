@@ -44,29 +44,6 @@ export function InstagramSection() {
           </a>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {posts.map((post, index) => (
-            <motion.a
-              href="https://www.instagram.com/softtarotgirl?igsh=MThqY2h0NDhrc2w3ag=="
-              target="_blank"
-              rel="noopener noreferrer"
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative aspect-square overflow-hidden rounded-xl group cursor-pointer"
-            >
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${post})` }}
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                <FaInstagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0" />
-              </div>
-            </motion.a>
-          ))}
-        </div>
       </div>
     </section>
   );

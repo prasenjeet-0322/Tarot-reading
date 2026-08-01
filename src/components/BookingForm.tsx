@@ -17,12 +17,20 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const name = formData.get('name') as string;
+    const phone = formData.get('phone') as string;
+    const plan = formData.get('plan') as string;
+    const timeToCall = formData.get('timeToCall') as string;
+    const userQuestion = formData.get('question') as string;
+    
+    const fullQuestion = `Preferred Time to Call: ${timeToCall}\n\nQuestion:\n${userQuestion}`;
+
     const { error } = await supabase.from('bookings').insert([
       { 
-        name: formData.get('name'), 
-        email: formData.get('phone'), 
-        plan: formData.get('plan'), 
-        question: formData.get('question') 
+        name: name, 
+        email: phone, 
+        plan: plan, 
+        question: fullQuestion 
       }
     ]);
     
@@ -35,6 +43,12 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
     }
     
     setSuccess(true);
+    
+    // Redirect to WhatsApp
+    const message = `Hi! I'd like to book a reading.\n\nName: ${name}\nPhone: ${phone}\nPlan: ${plan}\nPreferred Time: ${timeToCall}\nQuestion: ${userQuestion}`;
+    const waUrl = `https://wa.me/918445232346?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
+    
     // Reset form after 3 seconds
     setTimeout(() => setSuccess(false), 3000);
   };
@@ -123,6 +137,18 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
             )}
           </AnimatePresence>
           <input type="hidden" name="plan" value={selectedPlan} />
+        </div>
+
+        <div>
+          <label className="block text-sm text-gray-400 mb-1" htmlFor="timeToCall">Preferred Time to Call</label>
+          <input 
+            type="text" 
+            id="timeToCall" 
+            name="timeToCall" 
+            required 
+            className="w-full bg-[#1A182F] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+            placeholder="E.g., 2:00 PM - 4:00 PM"
+          />
         </div>
 
         <div>
