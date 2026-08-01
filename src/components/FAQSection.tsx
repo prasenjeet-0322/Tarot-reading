@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     question: "How is the reading delivered?",
-    answer: "Depending on your preference and the plan chosen, readings are delivered via a detailed written PDF, a private voice note, or a recorded video link sent directly to your email."
+    answer: "Depending on your preference and the plan chosen, readings are delivered via a detailed written PDF, a private voice note, or a recorded video link sent directly to your phone number via WhatsApp/SMS."
   }
 ];
 

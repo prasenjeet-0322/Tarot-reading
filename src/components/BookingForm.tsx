@@ -20,7 +20,7 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
     const { error } = await supabase.from('bookings').insert([
       { 
         name: formData.get('name'), 
-        email: formData.get('email'), 
+        email: formData.get('phone'), 
         plan: formData.get('plan'), 
         question: formData.get('question') 
       }
@@ -68,14 +68,14 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
         </div>
         
         <div>
-          <label className="block text-sm text-gray-400 mb-1" htmlFor="email">Email</label>
+          <label className="block text-sm text-gray-400 mb-1" htmlFor="phone">Phone Number</label>
           <input 
-            type="email" 
-            id="email" 
-            name="email" 
+            type="tel" 
+            id="phone" 
+            name="phone" 
             required 
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-[#D4AF37] transition-colors"
-            placeholder="your@email.com"
+            className="w-full bg-[#1A182F] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+            placeholder="Your Phone Number"
           />
         </div>
 

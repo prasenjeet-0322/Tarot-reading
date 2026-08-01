@@ -59,7 +59,7 @@ export default async function AdminPage() {
                   <tr className="bg-black/20 text-gray-400 text-sm uppercase tracking-wider">
                     <th className="p-4 border-b border-white/5 font-medium">Date</th>
                     <th className="p-4 border-b border-white/5 font-medium">Name</th>
-                    <th className="p-4 border-b border-white/5 font-medium">Email</th>
+                    <th className="p-4 border-b border-white/5 font-medium">Phone Number</th>
                     <th className="p-4 border-b border-white/5 font-medium">Plan</th>
                     <th className="p-4 border-b border-white/5 font-medium max-w-xs">Question</th>
                   </tr>
@@ -77,7 +77,7 @@ export default async function AdminPage() {
                           {booking.name}
                         </td>
                         <td className="p-4 text-gray-300 whitespace-nowrap">
-                          <a href={`mailto:${booking.email}`} className="hover:text-white transition-colors">
+                          <a href={`tel:${booking.email}`} className="hover:text-white transition-colors">
                             {booking.email}
                           </a>
                         </td>
