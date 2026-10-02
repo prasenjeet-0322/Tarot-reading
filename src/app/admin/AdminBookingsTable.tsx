@@ -12,7 +12,7 @@ import {
   RotateCcw,
   AlertCircle,
 } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaInstagram } from "react-icons/fa";
 
 interface AdminBookingsTableProps {
   initialBookings: BookingRecord[];
@@ -58,14 +58,14 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
   };
 
   return (
-    <div>
-      {/* Filter Tabs */}
+    <div className="w-full">
+      {/* Filter Tabs & Counter */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-1.5 p-1 bg-pink-100/60 rounded-full border border-pink-200">
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all ${
+            className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               filter === "all"
                 ? "bg-white text-gray-900 shadow-sm"
                 : "text-gray-600 hover:text-gray-900"
@@ -76,7 +76,7 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
           <button
             type="button"
             onClick={() => setFilter("pending")}
-            className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all flex items-center gap-1 ${
+            className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
               filter === "pending"
                 ? "bg-white text-amber-700 shadow-sm"
                 : "text-gray-600 hover:text-gray-900"
@@ -88,7 +88,7 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
           <button
             type="button"
             onClick={() => setFilter("completed")}
-            className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all flex items-center gap-1 ${
+            className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
               filter === "completed"
                 ? "bg-white text-emerald-700 shadow-sm"
                 : "text-gray-600 hover:text-gray-900"
@@ -121,14 +121,14 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
               <button
                 type="button"
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                className="flex-1 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => handleDelete(deleteConfirmId)}
-                className="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold text-white shadow-sm"
+                className="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold text-white shadow-sm cursor-pointer"
               >
                 Yes, Delete
               </button>
@@ -137,18 +137,16 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
         </div>
       )}
 
-      {/* Bookings Table */}
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <table className="w-full text-left border-collapse text-sm">
+      {/* Single View Bookings Container - Fits on screen with NO horizontal scroll slider */}
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <table className="w-full text-left border-collapse text-xs sm:text-sm table-fixed">
           <thead>
-            <tr className="bg-pink-50/70 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
-              <th className="p-4 whitespace-nowrap">Submitted At</th>
-              <th className="p-4 whitespace-nowrap">Client Name</th>
-              <th className="p-4 whitespace-nowrap">WhatsApp Contact</th>
-              <th className="p-4 whitespace-nowrap">Plan & Slot</th>
-              <th className="p-4 min-w-[240px]">Question & Notes</th>
-              <th className="p-4 whitespace-nowrap">Status</th>
-              <th className="p-4 whitespace-nowrap text-right">Actions</th>
+            <tr className="bg-pink-50/70 text-gray-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider border-b border-gray-200">
+              <th className="p-3 sm:p-4 w-[28%]">Client & Contact</th>
+              <th className="p-3 sm:p-4 w-[30%]">Booked Session & Slot</th>
+              <th className="p-3 sm:p-4 w-[16%] hidden md:table-cell">Submitted</th>
+              <th className="p-3 sm:p-4 w-[12%]">Status</th>
+              <th className="p-3 sm:p-4 w-[14%] text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -158,20 +156,81 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
                 const isCompleted = booking.status === "completed";
                 const isBusy = loadingId === booking.id;
 
+                // Extract Instagram handle from question notes if present
+                const instaMatch = booking.question?.match(/Instagram:\s*(@?[\w_.]+)/i);
+                const instaHandle = instaMatch ? instaMatch[1] : null;
+
                 return (
                   <tr
                     key={booking.id}
                     className={`transition-colors ${
-                      isCompleted ? "bg-emerald-50/25 hover:bg-emerald-50/40" : "hover:bg-pink-50/40"
+                      isCompleted ? "bg-emerald-50/20 hover:bg-emerald-50/35" : "hover:bg-pink-50/35"
                     }`}
                   >
-                    {/* Submitted At */}
-                    <td className="p-4 text-gray-600 whitespace-nowrap text-xs">
-                      <div className="flex items-center gap-1.5 font-medium text-gray-800">
-                        <Calendar className="w-3.5 h-3.5 text-pink-500" />
-                        {new Date(booking.created_at).toLocaleDateString()}
+                    {/* 1. Client & Contact */}
+                    <td className="p-3 sm:p-4 align-top">
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`font-bold text-sm sm:text-base leading-tight ${
+                            isCompleted ? "text-gray-500 line-through decoration-emerald-500" : "text-gray-900"
+                          }`}
+                        >
+                          {booking.name}
+                        </span>
+
+                        {/* Phone & WhatsApp Chat Button */}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                          <span className="font-medium text-gray-600 text-xs flex items-center gap-1">
+                            <Phone className="w-3 h-3 text-gray-400 shrink-0" />
+                            {booking.email}
+                          </span>
+                          {cleanPhone && (
+                            <a
+                              href={`https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(
+                                booking.name
+                              )}!%20This%20is%20Nidhi%20from%20SoftTarotGirl%20regarding%20your%20Tarot%20Reading%20session.`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white text-[10px] font-bold shadow-xs transition-all"
+                              title="Chat on WhatsApp"
+                            >
+                              <FaWhatsapp className="w-3 h-3" />
+                              <span>Chat</span>
+                            </a>
+                          )}
+                        </div>
+
+                        {/* Instagram handle */}
+                        {instaHandle && (
+                          <div className="flex items-center gap-1 text-[11px] text-pink-700 font-medium">
+                            <FaInstagram className="w-3 h-3 text-pink-500 shrink-0" />
+                            <span>{instaHandle.startsWith("@") ? instaHandle : `@${instaHandle}`}</span>
+                          </div>
+                        )}
                       </div>
-                      <span className="text-[11px] text-gray-400 pl-5">
+                    </td>
+
+                    {/* 2. Booked Session & Slot */}
+                    <td className="p-3 sm:p-4 align-top">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="inline-block px-2.5 py-1 bg-pink-100/70 border border-pink-300 rounded-lg text-xs font-semibold text-pink-800 leading-snug">
+                          {booking.plan}
+                        </span>
+
+                        <div className="text-[11px] text-gray-500 font-light flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-pink-500 shrink-0" />
+                          <span>Question to be asked directly on call</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* 3. Submitted At (Visible on tablet/desktop) */}
+                    <td className="p-3 sm:p-4 align-top hidden md:table-cell text-xs text-gray-600">
+                      <div className="flex items-center gap-1 font-medium text-gray-800">
+                        <Calendar className="w-3 h-3 text-pink-500 shrink-0" />
+                        <span>{new Date(booking.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <span className="text-[11px] text-gray-400 block mt-0.5">
                         {new Date(booking.created_at).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -179,77 +238,30 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
                       </span>
                     </td>
 
-                    {/* Client Name */}
-                    <td className="p-4 whitespace-nowrap">
-                      <span
-                        className={`font-bold text-sm ${
-                          isCompleted ? "text-gray-600 line-through decoration-emerald-500" : "text-gray-900"
-                        }`}
-                      >
-                        {booking.name}
-                      </span>
-                    </td>
-
-                    {/* WhatsApp Contact */}
-                    <td className="p-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-700 text-xs flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-gray-400" />
-                          {booking.email}
-                        </span>
-                        {cleanPhone && (
-                          <a
-                            href={`https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(
-                              booking.name
-                            )}!%20This%20is%20Nidhi%20from%20SoftTarotGirl%20regarding%20your%20Tarot%20Reading%20session.`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white text-[11px] font-bold shadow-sm transition-all"
-                            title="Open WhatsApp chat"
-                          >
-                            <FaWhatsapp className="w-3.5 h-3.5" />
-                            <span>Chat</span>
-                          </a>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Plan & Slot */}
-                    <td className="p-4 whitespace-nowrap">
-                      <span className="inline-block px-3 py-1 bg-pink-100/70 border border-pink-300 rounded-full text-xs font-semibold text-pink-800 shadow-sm">
-                        {booking.plan}
-                      </span>
-                    </td>
-
-                    {/* Question & Notes */}
-                    <td className="p-4 text-xs text-gray-600 leading-relaxed whitespace-pre-line">
-                      {booking.question}
-                    </td>
-
-                    {/* Status Badge */}
-                    <td className="p-4 whitespace-nowrap">
+                    {/* 4. Status */}
+                    <td className="p-3 sm:p-4 align-top">
                       {isCompleted ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Completed</span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span>Done</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                          <Clock className="w-3 h-3 text-amber-600 shrink-0" />
                           <span>Pending</span>
                         </span>
                       )}
                     </td>
 
-                    {/* Action Buttons: Mark Complete & Delete */}
-                    <td className="p-4 whitespace-nowrap text-right">
-                      <div className="inline-flex items-center gap-1.5">
-                        {/* Toggle Complete Button */}
+                    {/* 5. Actions */}
+                    <td className="p-3 sm:p-4 align-top text-right">
+                      <div className="inline-flex flex-col sm:flex-row items-end sm:items-center justify-end gap-1.5">
+                        {/* Complete / Reopen */}
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleToggleComplete(booking.id)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          className={`inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             isCompleted
                               ? "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200"
                               : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
@@ -263,21 +275,21 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
                             </>
                           ) : (
                             <>
-                              <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                              <span>Complete</span>
+                              <CheckCircle2 className="w-3 h-3 text-white" />
+                              <span>Done</span>
                             </>
                           )}
                         </button>
 
-                        {/* Delete Button */}
+                        {/* Delete */}
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => setDeleteConfirmId(booking.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all hover:border-rose-300 disabled:opacity-50"
+                          className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all hover:border-rose-300 disabled:opacity-50 cursor-pointer"
                           title="Delete booking"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                          <Trash2 className="w-3 h-3 text-rose-600" />
                           <span>Delete</span>
                         </button>
                       </div>
@@ -287,7 +299,7 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
               })
             ) : (
               <tr>
-                <td colSpan={7} className="p-12 text-center text-gray-400 italic">
+                <td colSpan={5} className="p-12 text-center text-gray-400 italic">
                   <span className="text-3xl block mb-2">🔮</span>
                   No bookings found in this view.
                 </td>

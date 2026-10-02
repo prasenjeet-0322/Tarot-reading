@@ -39,7 +39,7 @@ export default async function AdminPage() {
 
       {/* Top Banner Header */}
       <header className="relative bg-gradient-to-b from-[#500724] via-[#70123D] to-[#831843] text-white border-b border-pink-500/20 shadow-md">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4 text-center md:text-left">
             <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-pink-300 shadow-md shrink-0">
               <Image
@@ -89,7 +89,7 @@ export default async function AdminPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 -mt-4 relative z-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 -mt-4 relative z-10">
         {/* Metric Cards Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-pink-200/80 shadow-sm flex items-center gap-4">
