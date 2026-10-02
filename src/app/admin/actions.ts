@@ -1,6 +1,8 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
+import { deleteBookingRecord, toggleBookingStatusRecord } from "@/lib/bookingStore";
 
 export async function loginAdmin(formData: FormData) {
   const username = formData.get("username") as string;
@@ -29,4 +31,26 @@ export async function loginAdmin(formData: FormData) {
 export async function logoutAdmin() {
   const cookieStore = await cookies();
   cookieStore.delete("admin_auth");
+}
+
+export async function deleteBookingAction(bookingId: string) {
+  try {
+    await deleteBookingRecord(bookingId);
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete booking:", error);
+    return { success: false, error: "Failed to delete booking" };
+  }
+}
+
+export async function toggleBookingStatusAction(bookingId: string) {
+  try {
+    const updated = await toggleBookingStatusRecord(bookingId);
+    revalidatePath("/admin");
+    return { success: true, booking: updated };
+  } catch (error) {
+    console.error("Failed to update booking status:", error);
+    return { success: false, error: "Failed to update status" };
+  }
 }

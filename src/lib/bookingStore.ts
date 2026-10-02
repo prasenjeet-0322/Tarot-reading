@@ -9,6 +9,7 @@ export interface BookingRecord {
   email: string; // holds phone number
   plan: string;
   question: string;
+  status?: "pending" | "completed";
 }
 
 const DATA_FILE = path.join(process.cwd(), "data", "bookings.json");
@@ -19,7 +20,11 @@ function getLocalBookings(): BookingRecord[] {
       return [];
     }
     const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw);
+    const list: BookingRecord[] = JSON.parse(raw);
+    return list.map((b) => ({
+      ...b,
+      status: b.status || "pending",
+    }));
   } catch {
     return [];
   }
@@ -50,6 +55,7 @@ export async function addBooking(booking: {
     email: booking.email,
     plan: booking.plan,
     question: booking.question,
+    status: "pending",
   };
 
   // 1. Persist locally immediately
@@ -81,6 +87,45 @@ export async function addBooking(booking: {
   return newRecord;
 }
 
+export async function deleteBookingRecord(id: string): Promise<boolean> {
+  const current = getLocalBookings();
+  const updated = current.filter((b) => b.id !== id);
+  saveLocalBookings(updated);
+
+  // Also attempt Supabase deletion if connected
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (url && !url.includes("placeholder")) {
+      const supaPromise = supabaseAdmin.from("bookings").delete().eq("id", id);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Supabase timeout")), 1500)
+      );
+      await Promise.race([supaPromise, timeoutPromise]);
+    }
+  } catch {
+    // Fallback handled locally
+  }
+
+  return true;
+}
+
+export async function toggleBookingStatusRecord(id: string): Promise<BookingRecord | null> {
+  const current = getLocalBookings();
+  let updatedRecord: BookingRecord | null = null;
+
+  const updated = current.map((b) => {
+    if (b.id === id) {
+      const nextStatus: "pending" | "completed" = b.status === "completed" ? "pending" : "completed";
+      updatedRecord = { ...b, status: nextStatus };
+      return updatedRecord;
+    }
+    return b;
+  });
+
+  saveLocalBookings(updated);
+  return updatedRecord;
+}
+
 export async function getAllBookings(): Promise<{ data: BookingRecord[]; error: string | null }> {
   const local = getLocalBookings();
 
@@ -105,7 +150,11 @@ export async function getAllBookings(): Promise<{ data: BookingRecord[]; error: 
           mergedMap.set(item.id, item);
         }
         for (const item of res.data) {
-          mergedMap.set(item.id || item.created_at, item);
+          const existing = mergedMap.get(item.id || item.created_at);
+          mergedMap.set(item.id || item.created_at, {
+            ...item,
+            status: existing?.status || item.status || "pending",
+          });
         }
         const sorted = Array.from(mergedMap.values()).sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
