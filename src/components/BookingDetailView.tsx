@@ -88,7 +88,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
     setSubmitting(true);
 
     const bookingPlan = `${session.title} - ${currentSelectedDay.dayName} ${currentSelectedDay.dateStr} at ${selectedTime}`;
-    const fullNotes = `Instagram: ${instagram || "Not provided"}\nSelected Time: ${currentSelectedDay.dateStr} (${selectedTime})\nQuestion: ${question || "General guidance"}`;
+    const fullNotes = `Instagram: ${instagram}\nSelected Time: ${currentSelectedDay.dateStr} (${selectedTime})\nQuestion: To be asked directly on call / WhatsApp`;
 
     await submitBooking({
       name,
@@ -439,18 +439,9 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="client-question">
-                        What would you like clarity on? (Optional)
-                      </label>
-                      <textarea
-                        id="client-question"
-                        rows={3}
-                        value={question}
-                        onChange={(e) => setQuestion(e.target.value)}
-                        placeholder="Love, career, general life direction, spiritual blocks..."
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all resize-none"
-                      />
+                    <div className="p-3.5 rounded-2xl bg-pink-50/80 border border-pink-100 text-xs text-pink-900/80 leading-relaxed flex items-center gap-2.5">
+                      <span className="text-base select-none">🔮</span>
+                      <span>Questions will be discussed directly with Nidhi during your voice call or WhatsApp session.</span>
                     </div>
 
                     <div className="pt-4 flex items-center justify-between gap-4">

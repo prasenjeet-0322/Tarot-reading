@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { deleteBookingRecord, toggleBookingStatusRecord } from "@/lib/bookingStore";
 
 export async function loginAdmin(formData: FormData) {
@@ -16,10 +17,10 @@ export async function loginAdmin(formData: FormData) {
     validPasswords.includes(password?.trim())
   ) {
     const cookieStore = await cookies();
+    // Pure session cookie with no maxAge so browser discards it when session ends
     cookieStore.set("admin_auth", "true", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 1 week
       path: "/",
     });
     return { success: true };
@@ -31,6 +32,12 @@ export async function loginAdmin(formData: FormData) {
 export async function logoutAdmin() {
   const cookieStore = await cookies();
   cookieStore.delete("admin_auth");
+}
+
+export async function leaveAdminToSite() {
+  const cookieStore = await cookies();
+  cookieStore.delete("admin_auth");
+  redirect("/");
 }
 
 export async function deleteBookingAction(bookingId: string) {

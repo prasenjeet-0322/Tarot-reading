@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { LoginForm } from "./LoginForm";
-import { logoutAdmin } from "./actions";
+import { logoutAdmin, leaveAdminToSite } from "./actions";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -65,13 +65,15 @@ export default async function AdminPage() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all flex items-center gap-1.5"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>View Site</span>
-            </Link>
+            <form action={leaveAdminToSite}>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>View Site</span>
+              </button>
+            </form>
 
             <form action={logoutAdmin}>
               <button
