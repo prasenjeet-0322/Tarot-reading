@@ -2,6 +2,20 @@ import { cookies } from "next/headers";
 import { LoginForm } from "./LoginForm";
 import { supabaseAdmin } from "@/lib/supabase";
 import { logoutAdmin } from "./actions";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  LogOut,
+  Calendar,
+  Phone,
+  Sparkles,
+  ArrowLeft,
+  ExternalLink,
+} from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
+import { HalloweenDecorations } from "@/components/HalloweenDecorations";
+
+import { getAllBookings } from "@/lib/bookingStore";
 
 export const dynamic = "force-dynamic";
 
@@ -13,152 +27,217 @@ export default async function AdminPage() {
     return <LoginForm />;
   }
 
-  // Fetch bookings from Supabase
-  const { data: bookings, error: bookingsError } = await supabaseAdmin
-    .from("bookings")
-    .select("*")
-    .order("created_at", { ascending: false });
-    
-  // Fetch reviews from Supabase
-  const { data: reviews, error: reviewsError } = await supabaseAdmin
-    .from("reviews")
-    .select("*")
-    .order("created_at", { ascending: false });
+  // Fetch bookings reliably from local store and Supabase
+  const { data: bookings, error: bookingsError } = await getAllBookings();
+
+  const totalBookings = bookings?.length || 0;
+  const voiceCallBookings =
+    bookings?.filter((b) => b.plan?.toLowerCase().includes("voice") || b.plan?.toLowerCase().includes("min") || b.plan?.toLowerCase().includes("hour")).length || 0;
+  const cardPullBookings =
+    bookings?.filter((b) => b.plan?.toLowerCase().includes("card")).length || 0;
 
   return (
-    <div className="min-h-screen bg-[#0D0B1E] text-white font-sans p-6 md:p-12">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-center mb-12 border-b border-[#7B2FF7]/30 pb-6">
-          <div>
-            <h1 className="text-3xl font-serif text-[#D4AF37] mb-2">Superadmin Dashboard</h1>
-            <p className="text-gray-400">Manage your tarot reading bookings and client reviews.</p>
-          </div>
-          <form action={logoutAdmin}>
-            <button 
-              type="submit" 
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-gray-300 transition-colors"
-            >
-              Logout
-            </button>
-          </form>
-        </header>
+    <div className="min-h-screen bg-[#FDF2F8] text-gray-800 font-sans relative selection:bg-pink-300 selection:text-pink-900 pb-20">
+      <HalloweenDecorations />
 
-        <div className="mb-12">
-          <h2 className="text-2xl font-serif text-[#E8CC6F] mb-6">Booking Requests</h2>
+      {/* Top Banner Header */}
+      <header className="relative bg-gradient-to-b from-[#500724] via-[#70123D] to-[#831843] text-white border-b border-pink-500/20 shadow-md">
+        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4 text-center md:text-left">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-pink-300 shadow-md shrink-0">
+              <Image
+                src="/logo.jpeg"
+                alt="SoftTarotGirl Avatar"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-center md:justify-start gap-2">
+                <h1 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-white">
+                  Superadmin Dashboard
+                </h1>
+                <span className="text-xl">🎃</span>
+              </div>
+              <p className="text-xs text-pink-200/80 font-light mt-0.5">
+                Manage your tarot client bookings, WhatsApp chats, and schedule.
+              </p>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all flex items-center gap-1.5"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>View Site</span>
+            </Link>
+
+            <form action={logoutAdmin}>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-full bg-pink-900/60 hover:bg-pink-900 border border-pink-400/30 text-xs font-semibold text-pink-200 hover:text-white transition-all flex items-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 -mt-4 relative z-10">
+        {/* Metric Cards Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-pink-200/80 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-pink-50 border border-pink-200 flex items-center justify-center text-2xl shadow-inner shrink-0">
+              🔮
+            </div>
+            <div>
+              <span className="text-xs text-gray-500 font-medium block">Total Bookings</span>
+              <span className="text-2xl font-bold text-gray-900">{totalBookings}</span>
+            </div>
+          </div>
+
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-pink-200/80 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-2xl shadow-inner shrink-0">
+              📞
+            </div>
+            <div>
+              <span className="text-xs text-gray-500 font-medium block">Voice Calls</span>
+              <span className="text-2xl font-bold text-emerald-700">{voiceCallBookings}</span>
+            </div>
+          </div>
+
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-pink-200/80 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-2xl shadow-inner shrink-0">
+              🃏
+            </div>
+            <div>
+              <span className="text-xs text-gray-500 font-medium block">Card Pulls</span>
+              <span className="text-2xl font-bold text-amber-700">{cardPullBookings}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bookings Section */}
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-pink-200/90 shadow-[0_10px_35px_rgba(244,114,182,0.18)]">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+            <div>
+              <h2 className="text-xl font-serif font-bold text-gray-900 flex items-center gap-2">
+                Booking Requests
+                <Sparkles className="w-4 h-4 text-emerald-500" />
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Client submissions with requested slot times, contact details, and questions.
+              </p>
+            </div>
+
+            <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700 text-xs font-semibold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Live Database Connected
+            </span>
+          </div>
+
           {bookingsError ? (
-            <div className="p-6 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400">
-              Error loading bookings: {bookingsError.message}
-              <br/>
-              <span className="text-sm opacity-80 mt-2 block">Make sure you have created the `bookings` table in Supabase!</span>
+            <div className="p-6 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">
+              <p className="font-bold mb-1">Error loading bookings:</p>
+              <p>{bookingsError.message}</p>
+              <span className="text-xs opacity-80 mt-2 block">
+                Ensure Supabase credentials and `bookings` table exist.
+              </span>
             </div>
           ) : (
-            <div className="bg-[#1A1642] border border-[#7B2FF7]/30 rounded-2xl overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto rounded-2xl border border-gray-200">
+              <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="bg-black/20 text-gray-400 text-sm uppercase tracking-wider">
-                    <th className="p-4 border-b border-white/5 font-medium">Date</th>
-                    <th className="p-4 border-b border-white/5 font-medium">Name</th>
-                    <th className="p-4 border-b border-white/5 font-medium">Phone Number</th>
-                    <th className="p-4 border-b border-white/5 font-medium">Plan</th>
-                    <th className="p-4 border-b border-white/5 font-medium max-w-xs">Question</th>
+                  <tr className="bg-pink-50/70 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
+                    <th className="p-4 whitespace-nowrap">Submitted At</th>
+                    <th className="p-4 whitespace-nowrap">Client Name</th>
+                    <th className="p-4 whitespace-nowrap">WhatsApp Contact</th>
+                    <th className="p-4 whitespace-nowrap">Plan & Slot</th>
+                    <th className="p-4 min-w-[280px]">Question & Notes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-gray-100 bg-white">
                   {bookings && bookings.length > 0 ? (
-                    bookings.map((booking) => (
-                      <tr key={booking.id} className="hover:bg-white/5 transition-colors">
-                        <td className="p-4 text-gray-300 whitespace-nowrap text-sm">
-                          {new Date(booking.created_at).toLocaleDateString()}
-                          <br />
-                          <span className="text-xs text-gray-500">{new Date(booking.created_at).toLocaleTimeString()}</span>
-                        </td>
-                        <td className="p-4 font-medium text-[#E8CC6F] whitespace-nowrap">
-                          {booking.name}
-                        </td>
-                        <td className="p-4 text-gray-300 whitespace-nowrap">
-                          <a href={`tel:${booking.email}`} className="hover:text-white transition-colors">
-                            {booking.email}
-                          </a>
-                        </td>
-                        <td className="p-4">
-                          <span className="inline-block px-3 py-1 bg-[#7B2FF7]/20 border border-[#7B2FF7]/30 rounded-full text-xs font-semibold text-[#9B63F8] whitespace-nowrap">
-                            {booking.plan}
-                          </span>
-                        </td>
-                        <td className="p-4 text-gray-400 text-sm min-w-[300px]">
-                          {booking.question}
-                        </td>
-                      </tr>
-                    ))
+                    bookings.map((booking) => {
+                      const cleanPhone = booking.email?.replace(/[^0-9]/g, "");
+                      return (
+                        <tr
+                          key={booking.id}
+                          className="hover:bg-pink-50/40 transition-colors"
+                        >
+                          {/* Date Column */}
+                          <td className="p-4 text-gray-600 whitespace-nowrap text-xs">
+                            <div className="flex items-center gap-1.5 font-medium text-gray-800">
+                              <Calendar className="w-3.5 h-3.5 text-pink-500" />
+                              {new Date(booking.created_at).toLocaleDateString()}
+                            </div>
+                            <span className="text-[11px] text-gray-400 pl-5">
+                              {new Date(booking.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </td>
+
+                          {/* Client Name */}
+                          <td className="p-4 font-bold text-gray-900 whitespace-nowrap">
+                            {booking.name}
+                          </td>
+
+                          {/* Phone / WhatsApp Action */}
+                          <td className="p-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700 text-xs flex items-center gap-1">
+                                <Phone className="w-3 h-3 text-gray-400" />
+                                {booking.email}
+                              </span>
+                              {cleanPhone && (
+                                <a
+                                  href={`https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(booking.name)}!%20This%20is%20Nidhi%20from%20SoftTarotGirl%20regarding%20your%20Tarot%20Reading%20session.`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white text-[11px] font-bold shadow-sm transition-all"
+                                  title="Open WhatsApp chat"
+                                >
+                                  <FaWhatsapp className="w-3.5 h-3.5" />
+                                  <span>Chat</span>
+                                </a>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Plan Badge */}
+                          <td className="p-4 whitespace-nowrap">
+                            <span className="inline-block px-3 py-1 bg-pink-100/70 border border-pink-300 rounded-full text-xs font-semibold text-pink-800 shadow-sm">
+                              {booking.plan}
+                            </span>
+                          </td>
+
+                          {/* Question / Notes */}
+                          <td className="p-4 text-xs text-gray-600 leading-relaxed whitespace-pre-line">
+                            {booking.question}
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-gray-500 italic">
-                        No bookings yet. When users submit the form, they will appear here.
+                      <td colSpan={5} className="p-12 text-center text-gray-400 italic">
+                        <span className="text-3xl block mb-2">🔮</span>
+                        No bookings yet. When clients submit on the website, they will appear here in real-time.
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-            </div>
           )}
         </div>
-
-        <div>
-          <h2 className="text-2xl font-serif text-[#E8CC6F] mb-6">Client Reviews</h2>
-          {reviewsError ? (
-            <div className="p-6 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400">
-              Error loading reviews: {reviewsError.message}
-              <br/>
-              <span className="text-sm opacity-80 mt-2 block">Make sure you have created the `reviews` table in Supabase!</span>
-            </div>
-          ) : (
-            <div className="bg-[#1A1642] border border-[#7B2FF7]/30 rounded-2xl overflow-hidden shadow-2xl">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-black/20 text-gray-400 text-sm uppercase tracking-wider">
-                      <th className="p-4 border-b border-white/5 font-medium">Date</th>
-                      <th className="p-4 border-b border-white/5 font-medium">Name</th>
-                      <th className="p-4 border-b border-white/5 font-medium">Rating</th>
-                      <th className="p-4 border-b border-white/5 font-medium w-full">Review</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {reviews && reviews.length > 0 ? (
-                      reviews.map((review) => (
-                        <tr key={review.id} className="hover:bg-white/5 transition-colors">
-                          <td className="p-4 text-gray-300 whitespace-nowrap text-sm">
-                            {new Date(review.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="p-4 font-medium text-[#E8CC6F] whitespace-nowrap">
-                            {review.name}
-                          </td>
-                          <td className="p-4 text-gray-300 whitespace-nowrap">
-                            <div className="flex gap-1 text-[#D4AF37]">
-                              {review.rating} / 5
-                            </div>
-                          </td>
-                          <td className="p-4 text-gray-400 text-sm min-w-[300px]">
-                            {review.review}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={4} className="p-8 text-center text-gray-500 italic">
-                          No reviews yet. When users submit reviews, they will appear here.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

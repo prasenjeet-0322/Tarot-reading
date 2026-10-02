@@ -20,9 +20,7 @@ export function Header() {
   }, []);
 
   const navLinks = [
-    { name: "How it Works", href: "#how-it-works" },
     { name: "Pricing", href: "#pricing" },
-    { name: "Reviews", href: "#reviews" },
     { name: "FAQ", href: "#faq" },
   ];
 
@@ -38,7 +36,7 @@ export function Header() {
     <>
       <header 
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          isScrolled ? "bg-[#0D0B1E]/80 backdrop-blur-md border-b border-[#7B2FF7]/20 py-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]" : "bg-transparent py-6"
+          isScrolled ? "bg-[#1F071B]/85 backdrop-blur-md border-b border-[#F472B6]/20 py-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]" : "bg-transparent py-6"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
@@ -63,7 +61,7 @@ export function Header() {
             ))}
             <button 
               onClick={() => openBooking()}
-              className="px-5 py-2 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold text-sm rounded-full hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all"
+              className="px-5 py-2 bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#1F071B] font-semibold text-sm rounded-full hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all"
             >
               Book Reading
             </button>
@@ -87,7 +85,7 @@ export function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[60] bg-[#0D0B1E] flex flex-col p-6"
+            className="fixed inset-0 z-[60] bg-[#1F071B] flex flex-col p-6"
           >
             <div className="flex justify-between items-center mb-12">
               <div className="flex items-center gap-3">
@@ -116,7 +114,7 @@ export function Header() {
               ))}
               <button 
                 onClick={() => { setMobileMenuOpen(false); openBooking(); }}
-                className="mt-8 px-8 py-4 w-full max-w-xs bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#0D0B1E] font-semibold text-lg rounded-full shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                className="mt-8 px-8 py-4 w-full max-w-xs bg-gradient-to-r from-[#D4AF37] to-[#A68625] text-[#1F071B] font-semibold text-lg rounded-full shadow-[0_0_20px_rgba(212,175,55,0.3)]"
               >
                 Book Reading
               </button>

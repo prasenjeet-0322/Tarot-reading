@@ -5,7 +5,7 @@ import { BookingForm } from "./BookingForm";
 
 export function BookingSection() {
   return (
-    <section id="booking" className="py-12 bg-[#0D0B1E]/80 relative">
+    <section id="booking" className="py-12 bg-[#1F071B]/80 relative">
       <div className="max-w-4xl mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <motion.h2 

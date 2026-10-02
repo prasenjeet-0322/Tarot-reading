@@ -9,8 +9,19 @@ import { supabase } from "@/lib/supabase";
 export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(defaultPlan || "Voice Call - 10 Min (₹85)");
+  const [selectedPlan, setSelectedPlan] = useState(defaultPlan || "Voice Call - 10 Min (₹110)");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  const isVoiceCall = selectedPlan.includes("Voice Call");
+
+  const planOptions = defaultPlan?.includes("Card Reading") 
+    ? ["Card Reading (₹35 card)"]
+    : [
+        "Voice Call - 10 Min (₹110)",
+        "Voice Call - 20 Min (₹199)",
+        "Voice Call - 30 Min (₹249)",
+        "Voice Call - 1 Hour (₹450)"
+      ];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,10 +31,11 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
     const name = formData.get('name') as string;
     const phone = formData.get('phone') as string;
     const plan = formData.get('plan') as string;
-    const timeToCall = formData.get('timeToCall') as string;
+    const timeToCall = formData.get('timeToCall') as string || "Not Applicable";
     const userQuestion = formData.get('question') as string;
+    const instagram = formData.get('instagram') as string || "Not provided";
     
-    const fullQuestion = `Preferred Time to Call: ${timeToCall}\n\nQuestion:\n${userQuestion}`;
+    const fullQuestion = `Instagram: ${instagram}\nPreferred Time to Call: ${timeToCall}\n\nQuestion:\n${userQuestion}`;
 
     const { error } = await supabase.from('bookings').insert([
       { 
@@ -43,10 +55,7 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
     
     setSuccess(true);
     
-    // Redirect to WhatsApp
-    const message = `Hi! I'd like to book a reading.\n\nName: ${name}\nPhone: ${phone}\nPlan: ${plan}\nPreferred Time: ${timeToCall}\nQuestion: ${userQuestion}`;
-    const waUrl = `https://wa.me/918445232346?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, "_blank");
+
     
     // Reset form after 3 seconds
     setTimeout(() => setSuccess(false), 3000);
@@ -55,15 +64,15 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
   return (
     <div className="glass-card p-8 rounded-2xl max-w-lg mx-auto w-full relative overflow-hidden">
       {success && (
-        <div className="absolute inset-0 bg-[#0D0B1E]/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-center p-8">
+        <div className="absolute inset-0 bg-[#1F071B]/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-center p-8">
           <Sparkles className="w-12 h-12 text-[#D4AF37] mb-4" />
-          <h3 className="text-2xl font-serif text-white mb-2">Message Received</h3>
-          <p className="text-gray-300">Your question has been cast into the cosmos. I will get back to you shortly.</p>
+          <h3 className="text-2xl font-serif text-white mb-2">Request Submitted</h3>
+          <p className="text-gray-300">Your request is submitted. We will soon catch you or reply to you.</p>
         </div>
       )}
 
       <h3 className="text-2xl font-serif text-white mb-6 flex items-center gap-2">
-        <Send className="w-5 h-5 text-[#7B2FF7]" />
+        <Send className="w-5 h-5 text-[#F472B6]" />
         Book Your Reading
       </h3>
 
@@ -92,6 +101,18 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
           />
         </div>
 
+        <div>
+          <label className="block text-sm text-gray-400 mb-1" htmlFor="instagram">Instagram ID</label>
+          <input 
+            type="text" 
+            id="instagram" 
+            name="instagram" 
+            required
+            className="w-full bg-[#1A182F] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+            placeholder="@yourusername"
+          />
+        </div>
+
         <div className="relative">
           <label className="block text-sm text-gray-400 mb-1" htmlFor="plan">Selected Plan</label>
           <div 
@@ -111,13 +132,7 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
                 transition={{ duration: 0.2 }}
                 className="absolute z-50 w-full mt-2 bg-[#1A1642] border border-[#7B2FF7]/30 rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden"
               >
-                {[
-                  "Voice Call - 10 Min (₹85)",
-                  "Voice Call - 20 Min (₹145)",
-                  "Voice Call - 30 Min (₹170)",
-                  "Voice Call - 1 Hour (₹450)",
-                  "Card Reading (₹29 per card)"
-                ].map((option) => (
+                {planOptions.map((option) => (
                   <div
                     key={option}
                     onClick={() => {
@@ -138,17 +153,19 @@ export function BookingForm({ defaultPlan }: { defaultPlan?: string }) {
           <input type="hidden" name="plan" value={selectedPlan} />
         </div>
 
-        <div>
-          <label className="block text-sm text-gray-400 mb-1" htmlFor="timeToCall">Preferred Time to Call</label>
-          <input 
-            type="text" 
-            id="timeToCall" 
-            name="timeToCall" 
-            required 
-            className="w-full bg-[#1A182F] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-            placeholder="E.g., 2:00 PM - 4:00 PM"
-          />
-        </div>
+        {isVoiceCall && (
+          <div>
+            <label className="block text-sm text-gray-400 mb-1" htmlFor="timeToCall">Preferred Time to Call</label>
+            <input 
+              type="text" 
+              id="timeToCall" 
+              name="timeToCall" 
+              required={isVoiceCall} 
+              className="w-full bg-[#1A182F] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+              placeholder="E.g., 2:00 PM - 4:00 PM"
+            />
+          </div>
+        )}
 
         <div>
           <label className="block text-sm text-gray-400 mb-1" htmlFor="question">Your Question or Focus</label>

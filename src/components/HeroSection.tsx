@@ -6,6 +6,31 @@ import { Sparkles, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useBooking } from "@/context/BookingContext";
 
+const SpiderWeb = ({ className }: { className?: string }) => (
+  <svg className={`absolute pointer-events-none ${className || ''}`} viewBox="0 0 100 100">
+    <path d="M0,0 L100,0 M0,0 L80,50 M0,0 L50,80 M0,0 L0,100" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M20,0 Q20,10 16,10 Q10,16 0,20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M40,0 Q40,20 32,20 Q20,32 0,40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M60,0 Q60,30 48,30 Q30,48 0,60" fill="none" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M80,0 Q80,40 64,40 Q40,64 0,80" fill="none" stroke="currentColor" strokeWidth="0.5" />
+  </svg>
+);
+
+const Spider = ({ className }: { className?: string }) => (
+  <svg className={`drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] ${className || ''}`} viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="14" r="4" />
+    <circle cx="12" cy="8" r="2" />
+    <path d="M10,14 C6,12 2,16 2,16" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M10,13 C5,10 1,12 1,12" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M11,11 C7,8 3,8 3,8" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M12,10 C10,5 6,5 6,5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M14,14 C18,12 22,16 22,16" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M14,13 C19,10 23,12 23,12" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M13,11 C17,8 21,8 21,8" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M12,10 C14,5 18,5 18,5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+  </svg>
+);
+
 const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title: string; delay: number; backTitle: string; backDesc: string; defaultZIndex: number }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -14,7 +39,7 @@ const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title
       initial={{ opacity: 0, y: 100, rotateY: 90 }}
       animate={{ opacity: 1, y: 0, rotateY: 0 }}
       transition={{ duration: 1, delay, ease: "easeOut" }}
-      className="relative w-48 h-80 perspective-[1000px] cursor-pointer group"
+      className="relative w-32 sm:w-40 h-52 sm:h-64 perspective-[1000px] cursor-pointer group"
       onClick={() => setIsFlipped(!isFlipped)}
       style={{ zIndex: isFlipped ? 50 : defaultZIndex }}
     >
@@ -26,7 +51,7 @@ const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title
       >
         {/* Front */}
         <div 
-          className="absolute inset-0 rounded-xl overflow-hidden glass-card flex flex-col items-center justify-center shadow-[0_4px_30px_rgba(123,47,247,0.3)] border border-[#7B2FF7]/40"
+          className="absolute inset-0 rounded-xl overflow-hidden glass-card flex flex-col items-center justify-center shadow-[0_4px_30px_rgba(217,70,239,0.25)] border border-[#F472B6]/40"
           style={{ backfaceVisibility: 'hidden' }}
         >
           <div className="absolute inset-2 border border-[#D4AF37]/40 rounded-lg pointer-events-none" />
@@ -40,11 +65,11 @@ const TarotCard = ({ title, delay, backTitle, backDesc, defaultZIndex }: { title
 
         {/* Back */}
         <div 
-          className="absolute inset-0 rounded-xl overflow-hidden bg-gradient-to-b from-[#1A1642] to-[#0D0B1E] flex flex-col items-center justify-center shadow-lg border border-[#D4AF37]/50 p-5 text-center"
+          className="absolute inset-0 rounded-xl overflow-hidden bg-gradient-to-b from-[#380E31] to-[#1F071B] flex flex-col items-center justify-center shadow-lg border border-[#D4AF37]/50 p-5 text-center"
           style={{ transform: "rotateY(180deg)", backfaceVisibility: 'hidden' }}
         >
           <div className="absolute inset-2 border border-[#D4AF37]/20 rounded-lg pointer-events-none" />
-          <Sparkles className="w-8 h-8 text-[#7B2FF7] mb-4" />
+          <Sparkles className="w-8 h-8 text-[#F472B6] mb-4" />
           <h4 className="font-serif text-xl text-[#E8CC6F] font-semibold mb-3">{backTitle}</h4>
           <p className="text-sm text-gray-300 leading-relaxed font-light">{backDesc}</p>
         </div>
@@ -81,8 +106,8 @@ export function HeroSection() {
     setHeroStars(newStars);
   }, []);
 
-  const headingText1 = "Unlock the Secrets".split(" ");
-  const headingText2 = "Written in the Stars".split(" ");
+  const headingText1 = "Reveal the Secrets".split(" ");
+  const headingText2 = "Hidden in the Cards".split(" ");
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -106,9 +131,9 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-transparent">
+    <section className="relative min-h-[90vh] sm:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-transparent pt-24 sm:pt-0">
       {/* Background Nebula/Gradient effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#5816C7]/20 via-[#0D0B1E]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9D174D]/25 via-[#1F071B]/60 to-transparent pointer-events-none" />
       
       {/* Local Hero Stars for density */}
       {mounted && (
@@ -138,25 +163,25 @@ export function HeroSection() {
         </div>
       )}
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between px-6 lg:px-12 max-w-7xl mx-auto mt-12 sm:mt-20 gap-8 sm:gap-16 w-full">
+      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between px-6 lg:px-12 max-w-7xl mx-auto mt-4 sm:mt-8 gap-4 lg:gap-8 w-full">
         {/* Left Side: Text */}
-        <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left pt-0">
+        <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left pt-0 w-full">
           <motion.h1 
             variants={containerVariants as any}
             initial="hidden"
             animate="visible"
-            className="font-serif text-5xl md:text-6xl lg:text-7xl font-medium text-transparent bg-clip-text bg-gradient-to-b from-[#F5F0E6] to-[#E8CC6F]/80 mb-6 drop-shadow-lg leading-tight flex flex-col items-center lg:items-start"
+            className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#F5F0E6] to-[#E8CC6F]/80 mb-6 drop-shadow-lg leading-tight flex flex-col items-center lg:items-start w-full"
           >
-            <div>
+            <div className="flex flex-wrap justify-center lg:justify-start">
             {headingText1.map((word, i) => (
-              <motion.span key={i} variants={wordVariants as any} className="inline-block mr-2 md:mr-3">
+              <motion.span key={i} variants={wordVariants as any} className="inline-block mr-3 md:mr-4">
                 {word}
               </motion.span>
             ))}
             </div>
-            <div className="mt-2 text-center lg:text-left">
+            <div className="mt-2 flex flex-wrap justify-center lg:justify-start">
               {headingText2.map((word, i) => (
-                <motion.span key={i} variants={wordVariants as any} className="inline-block italic text-[#D4AF37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] mr-2 md:mr-3">
+                <motion.span key={i} variants={wordVariants as any} className="inline-block text-[#D4AF37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] mr-3 md:mr-4">
                   {word}
                 </motion.span>
               ))}
@@ -193,39 +218,64 @@ export function HeroSection() {
         </div>
 
         {/* Right Side: Floating Cards */}
-        <div className="flex-1 w-full relative h-[250px] sm:h-[450px] perspective-[1000px] z-20 mt-24 sm:mt-12 lg:mt-0">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-0 sm:-rotate-12 -ml-[110px] sm:-ml-24 lg:-ml-32 scale-[0.55] sm:scale-100 transition-transform duration-300">
-             <TarotCard 
-                defaultZIndex={0}
-                title="The Past" 
-                delay={1.0} 
+        <div className="flex-1 w-full relative z-20 mt-0 flex justify-center items-center">
+          
+          {/* Creepy Web Background */}
+          <SpiderWeb className="w-72 h-72 absolute -top-10 -right-10 text-white/5 opacity-40 rotate-90 pointer-events-none" />
+          <SpiderWeb className="w-96 h-96 absolute -bottom-20 -left-10 text-white/5 opacity-30 -rotate-90 pointer-events-none" />
+
+          {/* Cards Container */}
+          <div className="flex flex-row items-center justify-start lg:justify-center gap-4 sm:gap-6 w-full overflow-x-auto pb-8 pt-8 px-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            
+            {/* Left Card: Past */}
+            <div className="flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-4">
+              <TarotCard 
+                defaultZIndex={10}
+                title="Past" 
+                delay={0.8} 
                 backTitle="The Moon"
-                backDesc="Hidden influences and lessons learned from the shadows of your past."
+                backDesc="Illusions are fading. Trust your intuition."
               />
-          </div>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shadow-2xl scale-[0.55] sm:scale-110 transition-transform duration-300">
-            <TarotCard 
-              defaultZIndex={10}
-              title="The Present" 
-              delay={1.1} 
-              backTitle="The Magician"
-              backDesc="You hold all the tools required to manifest your current desires."
-            />
-          </div>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-0 sm:rotate-12 ml-[110px] sm:ml-24 lg:ml-32 scale-[0.55] sm:scale-100 transition-transform duration-300">
-            <TarotCard 
-              defaultZIndex={0}
-              title="The Future" 
-              delay={1.2} 
-              backTitle="The Sun"
-              backDesc="Joy, success, and brilliant outcomes await on your horizon."
-            />
+            </div>
+
+            {/* Center Card: Present */}
+            <div className="relative flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-4 z-30">
+              <TarotCard 
+                defaultZIndex={30}
+                title="Present" 
+                delay={1.0} 
+                backTitle="The Magician"
+                backDesc="You hold all the tools required to manifest your desires."
+              />
+              
+              {/* Hanging Spider */}
+              <motion.div 
+                animate={{ y: [0, 15, 0] }} 
+                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                className="absolute -top-20 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none"
+              >
+                <div className="w-[1px] h-14 bg-white/20" />
+                <Spider className="w-5 h-5 -mt-1 text-gray-400" />
+              </motion.div>
+            </div>
+
+            {/* Right Card: Future */}
+            <div className="flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-4">
+              <TarotCard 
+                defaultZIndex={10}
+                title="Future" 
+                delay={1.2} 
+                backTitle="The Star"
+                backDesc="Hope and inspiration light your path forward."
+              />
+            </div>
+
           </div>
         </div>
       </div>
       
       {/* Bottom fade for transition to next section */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0D0B1E] to-transparent pointer-events-none z-30" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#1F071B] to-transparent pointer-events-none z-30" />
     </section>
   );
 }
