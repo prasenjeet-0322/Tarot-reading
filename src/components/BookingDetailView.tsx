@@ -429,11 +429,12 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
 
                     <div>
                       <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="client-instagram">
-                        Instagram Handle (Optional)
+                        Instagram Handle *
                       </label>
                       <input
                         id="client-instagram"
                         type="text"
+                        required
                         value={instagram}
                         onChange={(e) => setInstagram(e.target.value)}
                         placeholder="e.g. @priya_tarot"
