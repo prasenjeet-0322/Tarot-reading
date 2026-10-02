@@ -229,20 +229,17 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         <button
                           key={day.fullIso}
                           onClick={() => setSelectedDayIndex(actualIdx)}
-                          className={`flex flex-col items-center justify-center py-3 px-1.5 rounded-xl border transition-all text-center ${
+                          className={`flex flex-col items-center justify-center py-3.5 px-2 rounded-xl border transition-all text-center ${
                             isSelected
-                              ? "border-pink-600 bg-pink-50/50 ring-2 ring-pink-500/20 shadow-sm"
+                              ? "border-pink-600 bg-pink-50/60 ring-2 ring-pink-500/20 shadow-sm"
                               : "border-gray-200 hover:border-pink-300 hover:bg-gray-50/70"
                           }`}
                         >
                           <span className={`text-[10px] sm:text-xs font-semibold uppercase ${isSelected ? "text-pink-700" : "text-gray-500"}`}>
                             {day.dayName}
                           </span>
-                          <span className={`text-xs sm:text-sm font-bold my-0.5 ${isSelected ? "text-gray-900" : "text-gray-800"}`}>
+                          <span className={`text-xs sm:text-sm font-bold mt-1 ${isSelected ? "text-gray-900" : "text-gray-800"}`}>
                             {day.dateStr}
-                          </span>
-                          <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded-md mt-1">
-                            {day.slots} slots
                           </span>
                         </button>
                       );
