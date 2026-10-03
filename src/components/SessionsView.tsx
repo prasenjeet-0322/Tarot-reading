@@ -14,50 +14,28 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
 
   return (
     <div className="w-full">
-      {/* Main Title Row with Witchy Divination Theme */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-5 border-b border-pink-100">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-200 via-rose-100 to-purple-200 flex items-center justify-center text-xl shadow-inner border border-pink-300/60">
-            🔮
-          </div>
-          <div>
-            <h2 className="text-xl sm:text-2xl font-serif font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              <span>Tarot Divination Offerings</span>
-              <span className="text-xs text-pink-600 font-sans font-medium px-2 py-0.5 rounded-full bg-pink-100/70 border border-pink-200">
-                ✦ Sacred Menu
-              </span>
-            </h2>
-            <p className="text-xs text-pink-700/85 font-medium flex items-center gap-1.5 mt-0.5">
-              <span>Choose your reading format & step into the sacred circle</span>
-              <span className="text-pink-400">✦</span>
-              <span className="font-serif italic text-pink-600">Pure Intuitive Energy</span>
-            </p>
-          </div>
+      {/* Main Title Row */}
+      <div className="flex items-center gap-3 mb-8 pb-4 border-b border-pink-100">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-200 via-rose-100 to-purple-200 flex items-center justify-center text-xl shadow-inner border border-pink-300/60 shrink-0">
+          🔮
         </div>
-
-        {/* Witchy / Spooky Season Pill */}
-        <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-50 via-pink-50 to-emerald-50 border border-pink-200 text-pink-900 text-xs font-semibold shadow-sm">
-          <span>🌙</span>
-          <span className="text-purple-900">Waxing Moon Magic</span>
-          <span className="text-pink-400">✦</span>
-          <span>🎃</span>
-          <span className="text-emerald-800">Spooky Guidance</span>
+        <div>
+          <h2 className="text-xl sm:text-2xl font-serif font-bold text-gray-900 tracking-tight">
+            Tarot Divination Offerings
+          </h2>
+          <p className="text-xs text-pink-700/85 font-medium mt-0.5">
+            Choose your reading format & step into the sacred circle
+          </p>
         </div>
       </div>
 
-      {/* SECTION 1: Voice Call Readings (The Oracle Speaks) */}
+      {/* SECTION 1: Voice Call Readings */}
       <div className="mb-10">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2.5 mb-4">
           <span className="text-xl select-none">🕯️</span>
-          <div>
-            <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800 flex items-center gap-2">
-              <span>Live Voice Divinations</span>
-              <span className="text-[11px] font-sans text-pink-600 font-normal">✦ Real-time Energy Channeling</span>
-            </h3>
-          </div>
-          <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-300 px-2.5 py-0.5 rounded-full ml-auto sm:ml-3">
-            ● 1-on-1 Sanctuary Call
-          </span>
+          <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800">
+            Live Voice Divinations
+          </h3>
         </div>
 
         {/* Grid of Voice Call Sessions styled as Witchy Tarot Cards */}
@@ -165,19 +143,13 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
         <span className="h-[1px] w-16 bg-gradient-to-l from-transparent to-pink-300/60" />
       </div>
 
-      {/* SECTION 2: Card Readings (The Tarot Arcana) */}
+      {/* SECTION 2: Card Readings */}
       <div>
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2.5 mb-4">
           <span className="text-xl select-none">🃏</span>
-          <div>
-            <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800 flex items-center gap-2">
-              <span>Sacred Arcana Pulls</span>
-              <span className="text-[11px] font-sans text-pink-600 font-normal">✦ Direct Card Whispers</span>
-            </h3>
-          </div>
-          <span className="text-xs font-medium text-pink-800 bg-pink-100/70 border border-pink-300 px-2.5 py-0.5 rounded-full ml-auto sm:ml-3">
-            WhatsApp Audio + Photos
-          </span>
+          <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800">
+            Sacred Arcana Pulls
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

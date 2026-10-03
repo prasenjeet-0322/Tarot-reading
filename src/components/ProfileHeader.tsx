@@ -44,7 +44,7 @@ export function ProfileHeader() {
 
         {/* Profile Info */}
         <div className="flex-1 max-w-2xl">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mb-1.5">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mb-2">
             <h1 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-white flex items-center gap-2">
               <span>SoftTarotGirl</span>
               <Sparkles className="w-5 h-5 text-pink-300 fill-pink-300 animate-pulse" />
@@ -55,15 +55,9 @@ export function ProfileHeader() {
             </span>
           </div>
 
-          <div className="flex items-center justify-center sm:justify-start gap-2 text-pink-200/95 text-sm font-medium mb-3">
-            <span className="font-serif italic tracking-wide text-pink-100">
-              Intuitive Witchy Tarot Diviner & Energy Alchemist
-            </span>
-            <span className="text-pink-400 text-xs">✦</span>
-            <span className="text-xs text-amber-200/90 bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-500/20">
-              ☾ Moon Channeled
-            </span>
-          </div>
+          <p className="text-pink-200/90 text-xs sm:text-sm font-serif italic tracking-wide mb-3">
+            Intuitive Witchy Tarot Diviner & Energy Alchemist
+          </p>
 
           <p className="text-pink-100/85 text-xs sm:text-sm leading-relaxed mb-4 font-light">
             Guiding your spirit through the ancient mystic veil of Tarot. Uncovering secrets, aligning your cosmic energy, and channeling direct answers from the universe to attract your sacred reality. 🕯️🔮✨
@@ -71,26 +65,27 @@ export function ProfileHeader() {
 
           {/* Social Links & Witchy Tags */}
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-            {/* Instagram Link */}
+            {/* Instagram Link with Handle on the Right Side */}
             <a
               href="https://www.instagram.com/softarotgirl?stkn=MWVmOHMwb3lqMWkwaQ=="
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Follow on Instagram"
-              className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-[0_0_20px_rgba(238,42,123,0.6)] transition-all"
+              aria-label="Follow @softarotgirl on Instagram"
+              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white font-semibold text-xs sm:text-sm shadow-lg hover:scale-105 hover:shadow-[0_0_20px_rgba(238,42,123,0.6)] transition-all"
             >
-              <FaInstagram className="w-5 h-5" />
+              <FaInstagram className="w-4 h-4 shrink-0 text-white" />
+              <span className="tracking-wide font-medium">@softarotgirl</span>
             </a>
 
-            {/* Witchy Occult Badges */}
-            <span className="text-xs text-pink-200 bg-pink-950/70 border border-pink-400/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+            {/* Witchy Occult Badge */}
+            <span className="text-xs text-pink-200 bg-pink-950/70 border border-pink-400/30 px-3.5 py-2 rounded-full flex items-center gap-1.5 shadow-sm">
               <span>🧹</span>
               <span className="font-medium">Witchcraft & Divination</span>
             </span>
 
-            <span className="text-xs text-emerald-300 bg-emerald-950/70 border border-emerald-500/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+            <span className="text-xs text-emerald-300 bg-emerald-950/70 border border-emerald-500/30 px-3.5 py-2 rounded-full flex items-center gap-1.5 shadow-sm">
               <span>🎃</span>
-              <span>Spooky Season Magic</span>
+              <span>Spooky Magic</span>
             </span>
           </div>
         </div>
