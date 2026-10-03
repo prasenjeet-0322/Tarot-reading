@@ -357,12 +357,12 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                   <p className="text-sm text-gray-600 max-w-md mb-6 leading-relaxed">
                     Thank you, <span className="font-semibold text-pink-700">{name}</span>! Your slot for{" "}
                     <span className="font-semibold text-gray-900">{currentSelectedDay.dateStr} at {selectedTime}</span> has been saved. 
-                    Nidhi will reach out to you on WhatsApp shortly. ✨
+                    SoftTarotGirl will reach out to you on WhatsApp shortly to divine your spread. 🔮✨
                   </p>
 
                   <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium mb-8 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Admin dashboard notified. Prepare your energy & intentions!</span>
+                    <span>Sacred sanctuary reserved. Prepare your cosmic energy & intentions!</span>
                   </div>
 
                   <button
@@ -441,7 +441,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
 
                     <div className="p-3.5 rounded-2xl bg-pink-50/80 border border-pink-100 text-xs text-pink-900/80 leading-relaxed flex items-center gap-2.5">
                       <span className="text-base select-none">🔮</span>
-                      <span>Questions will be discussed directly with Nidhi during your voice call or WhatsApp session.</span>
+                      <span>Questions will be channeled and discussed directly during your voice call or WhatsApp session.</span>
                     </div>
 
                     <div className="pt-4 flex items-center justify-between gap-4">

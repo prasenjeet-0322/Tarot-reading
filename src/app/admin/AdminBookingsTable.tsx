@@ -188,7 +188,7 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
                             <a
                               href={`https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(
                                 booking.name
-                              )}!%20This%20is%20Nidhi%20from%20SoftTarotGirl%20regarding%20your%20Tarot%20Reading%20session.`}
+                              )}!%20This%20is%20SoftTarotGirl%20regarding%20your%20Tarot%20Reading%20session.`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white text-[10px] font-bold shadow-xs transition-all"
