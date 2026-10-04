@@ -94,6 +94,8 @@ function saveLocalBookings(bookings: BookingRecord[]) {
   }
 }
 
+export const BREAK_MINUTES = 10;
+
 export function isSlotOverlapping(
   dateStr: string,
   startMinutes: number,
@@ -114,10 +116,16 @@ export function isSlotOverlapping(
 
     if (dateMatches) {
       const bStart = b.startMinutes ?? 0;
-      const bEnd = b.endMinutes ?? (bStart + (b.durationMinutes || 10));
+      const bDur = b.durationMinutes || 10;
+      // Existing booking block includes session duration + minimum 10-minute break
+      const bEnd = b.endMinutes ?? (bStart + bDur);
+      const bBlockedEnd = bEnd + BREAK_MINUTES;
+
+      // Incoming session also requires its duration + minimum 10-minute break
+      const incomingBlockedEnd = endMinutes + BREAK_MINUTES;
 
       // Overlap condition: startA < endB && startB < endA
-      if (startMinutes < bEnd && bStart < endMinutes) {
+      if (startMinutes < bBlockedEnd && bStart < incomingBlockedEnd) {
         return true;
       }
     }
@@ -152,7 +160,8 @@ export function getBookedIntervalsForDate(dateStr: string): Array<{
     if (dateMatches) {
       const bStart = b.startMinutes ?? 0;
       const dur = b.durationMinutes || 10;
-      const bEnd = b.endMinutes ?? (bStart + dur);
+      // Block the duration plus the 10-minute break
+      const bEnd = (b.endMinutes ?? (bStart + dur)) + BREAK_MINUTES;
       intervals.push({
         startMinutes: bStart,
         endMinutes: bEnd,

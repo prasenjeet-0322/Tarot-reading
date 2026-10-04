@@ -81,26 +81,33 @@ function getUpcomingDays() {
   return days;
 }
 
+export const BREAK_MINUTES = 10;
+
 export function generateSlotsForDay(isWeekend: boolean, durationMinutes: number) {
   // Monday to Friday: 6:00 PM (1080) to 9:00 PM (1260)
   // Saturday & Sunday: 12:00 PM (720) to 10:00 PM (1320)
-  const step = durationMinutes > 0 ? durationMinutes : 15;
+  // Step between slot start times includes session duration + minimum 10-minute break:
+  let step = durationMinutes + BREAK_MINUTES;
+  if (durationMinutes === 60) {
+    step = 75; // 60 min session + 15 min break (clean 1h 15m intervals with >= 10m break)
+  }
+
   const middaySlots: string[] = [];
   const eveningSlots: string[] = [];
 
   if (!isWeekend) {
     // Weekdays (Mon-Fri): 6:00 PM to 9:00 PM
-    for (let m = 1080; m + step <= 1260; m += step) {
+    for (let m = 1080; m + durationMinutes <= 1260; m += step) {
       eveningSlots.push(minutesToTimeString(m));
     }
   } else {
     // Weekends (Sat-Sun): 12:00 PM to 10:00 PM
     // Afternoon: 12:00 PM (720) to 5:00 PM (1020)
-    for (let m = 720; m < 1020 && m + step <= 1320; m += step) {
+    for (let m = 720; m < 1020 && m + durationMinutes <= 1320; m += step) {
       middaySlots.push(minutesToTimeString(m));
     }
     // Evening & Night: 5:00 PM (1020) to 10:00 PM (1320)
-    for (let m = 1020; m + step <= 1320; m += step) {
+    for (let m = 1020; m + durationMinutes <= 1320; m += step) {
       eveningSlots.push(minutesToTimeString(m));
     }
   }
@@ -150,13 +157,13 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
   const [phone, setPhone] = useState("");
   const [instagram, setInstagram] = useState("");
 
-  // Helper to check if a specific time slot is booked
+  // Helper to check if a specific time slot is booked (including 10 min break buffer)
   const isSlotBooked = (slotTimeStr: string): boolean => {
     if (!slotTimeStr) return false;
     const start = timeToMinutes(slotTimeStr);
     const end = start + durationMinutes;
     return bookedIntervals.some(
-      (b) => start < b.endMinutes && b.startMinutes < end
+      (b) => start < b.endMinutes && b.startMinutes < (end + BREAK_MINUTES)
     );
   };
 
