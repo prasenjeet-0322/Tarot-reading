@@ -16,6 +16,14 @@ import {
   CheckCircle2,
   Calendar,
   Lock,
+  Upload,
+  Image as ImageIcon,
+  Copy,
+  Check,
+  QrCode,
+  CreditCard,
+  X,
+  AlertCircle,
 } from "lucide-react";
 import { submitBooking, fetchBookedIntervals } from "@/app/actions/booking";
 
@@ -118,6 +126,39 @@ export function generateSlotsForDay(isWeekend: boolean, durationMinutes: number)
   };
 }
 
+// Helper to compress screenshot to responsive base64
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 900;
+        let width = img.width;
+        let height = img.height;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = () => resolve(event.target?.result as string);
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
   const days = getUpcomingDays();
   const durationMinutes = getSessionDurationMinutes(session);
@@ -146,8 +187,8 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
     date: string;
   } | null>(null);
 
-  // Form State for Checkout/Confirmation
-  const [isCheckoutStep, setIsCheckoutStep] = useState(false);
+  // Step State: "slot" | "details" | "payment"
+  const [bookingStep, setBookingStep] = useState<"slot" | "details" | "payment">("slot");
   const [submitting, setSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -156,6 +197,18 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [instagram, setInstagram] = useState("");
+
+  // Payment State
+  const [paymentScreenshot, setPaymentScreenshot] = useState<string | null>(null);
+  const [paymentFileName, setPaymentFileName] = useState<string | null>(null);
+  const [paymentUtr, setPaymentUtr] = useState("");
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "softtarotgirl@upi";
+  const UPI_PAYEE_NAME = "SoftTarotGirl";
+  const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${session.priceValue}&cu=INR&tn=${encodeURIComponent(`Tarot-${session.title}`)}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=${encodeURIComponent(upiDeepLink)}`;
 
   // Helper to check if a specific time slot is booked (including 10 min break buffer)
   const isSlotBooked = (slotTimeStr: string): boolean => {
@@ -218,16 +271,57 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
       return;
     }
     setBookingError(null);
-    setIsCheckoutStep(true);
+    setBookingStep("details");
+  };
+
+  const handleProceedToPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !phone.trim() || !instagram.trim()) {
+      setBookingError("Please complete all required fields.");
+      return;
+    }
+    setBookingError(null);
+    setUploadError(null);
+    setBookingStep("payment");
+  };
+
+  const handleScreenshotChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError(null);
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please upload an image file (JPG, PNG, WebP).");
+      return;
+    }
+    try {
+      const base64 = await compressImage(file);
+      setPaymentScreenshot(base64);
+      setPaymentFileName(file.name);
+    } catch {
+      setUploadError("Failed to process image. Please try again.");
+    }
+  };
+
+  const handleCopyUpi = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(UPI_ID);
+      setCopiedUpi(true);
+      setTimeout(() => setCopiedUpi(false), 2000);
+    }
   };
 
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!paymentScreenshot) {
+      setUploadError("Please attach your payment screenshot to confirm.");
+      return;
+    }
+
     setSubmitting(true);
     setBookingError(null);
 
     const bookingPlan = `${session.title} - ${currentSelectedDay.dayName} ${currentSelectedDay.dateStr} at ${selectedTime}`;
-    const fullNotes = `Instagram: ${instagram}\nSelected Time: ${currentSelectedDay.dateStr} (${selectedTime})\nQuestion: To be asked directly on call / WhatsApp`;
+    const fullNotes = `Instagram: ${instagram}\nSelected Time: ${currentSelectedDay.dateStr} (${selectedTime})\nQuestion: To be asked directly on call / WhatsApp\nPayment Proof: Screenshot Attached${paymentUtr ? `\nUTR/Ref: ${paymentUtr}` : ""}`;
 
     const res = await submitBooking({
       name,
@@ -237,6 +331,9 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
       bookingDate: currentSelectedDay.dateStr,
       bookingTime: selectedTime,
       durationMinutes,
+      paymentScreenshot,
+      paymentUtr,
+      amount: session.price,
     });
 
     setSubmitting(false);
@@ -527,9 +624,9 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
               </div>
             </motion.div>
           ) : (
-            /* STEP 2: Checkout Form & Client Details */
+            /* STEP 2 & 3: Details & Payment */
             <motion.div
-              key="checkout-step"
+              key={bookingStep}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -546,36 +643,37 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                   </h3>
                   <p className="text-sm text-gray-600 max-w-md mb-6 leading-relaxed">
                     Thank you, <span className="font-semibold text-pink-700">{name}</span>! Your slot for{" "}
-                    <span className="font-semibold text-gray-900">{currentSelectedDay.dateStr} at {selectedTime}</span> has been saved. 
-                    SoftTarotGirl will reach out to you on WhatsApp shortly to divine your spread. 🔮✨
+                    <span className="font-semibold text-gray-900">{currentSelectedDay.dateStr} at {selectedTime}</span> and payment screenshot of{" "}
+                    <span className="font-bold text-pink-700">{session.price}</span> have been received. 
+                    SoftTarotGirl will verify your proof and reach out to you on WhatsApp shortly to divine your spread. 🔮✨
                   </p>
 
                   <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium mb-8 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Sacred sanctuary reserved. Prepare your cosmic energy & intentions!</span>
+                    <span>Sacred sanctuary reserved & payment proof submitted!</span>
                   </div>
 
                   <button
                     onClick={onBack}
                     type="button"
-                    className="px-6 py-2.5 rounded-full bg-pink-600 hover:bg-pink-700 text-white font-semibold text-sm transition-all"
+                    className="px-6 py-2.5 rounded-full bg-pink-600 hover:bg-pink-700 text-white font-semibold text-sm transition-all shadow-md"
                   >
                     Back to Sessions
                   </button>
                 </div>
-              ) : (
-                /* Contact Details Form */
+              ) : bookingStep === "details" ? (
+                /* STEP 2: Contact Details Form */
                 <div>
                   <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">Final Step: Your Details</h3>
+                      <h3 className="text-xl font-bold text-gray-900">Step 2: Your Details</h3>
                       <p className="text-xs text-gray-500 mt-0.5">
                         Selected: <span className="text-pink-600 font-semibold">{session.title}</span> on{" "}
                         <span className="text-gray-800 font-semibold">{currentSelectedDay.dateStr}, {selectedTime}</span>
                       </p>
                     </div>
                     <button
-                      onClick={() => setIsCheckoutStep(false)}
+                      onClick={() => setBookingStep("slot")}
                       type="button"
                       className="text-xs font-semibold text-gray-500 hover:text-pink-600 underline"
                     >
@@ -590,7 +688,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                     </div>
                   )}
 
-                  <form onSubmit={handleConfirmBooking} className="space-y-4">
+                  <form onSubmit={handleProceedToPayment} className="space-y-4">
                     <div>
                       <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="client-name">
                         Your Full Name *
@@ -601,7 +699,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Priya Sharma"
+                        placeholder="e.g. Aarohi Verma"
                         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all"
                       />
                     </div>
@@ -631,7 +729,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         required
                         value={instagram}
                         onChange={(e) => setInstagram(e.target.value)}
-                        placeholder="e.g. @priya_tarot"
+                        placeholder="e.g. @mystic_aurora"
                         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all"
                       />
                     </div>
@@ -644,7 +742,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                     <div className="pt-4 flex items-center justify-between gap-4">
                       <button
                         type="button"
-                        onClick={() => setIsCheckoutStep(false)}
+                        onClick={() => setBookingStep("slot")}
                         className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:bg-gray-50"
                       >
                         Back
@@ -652,14 +750,227 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
 
                       <button
                         type="submit"
-                        disabled={submitting}
-                        className="flex-1 py-3 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="flex-1 py-3 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2"
                       >
-                        <Send className="w-4 h-4" />
-                        <span>{submitting ? "Booking Your Slot..." : `Confirm & Book (${session.price})`}</span>
+                        <span>Proceed to Payment ({session.price})</span>
+                        <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
                   </form>
+                </div>
+              ) : (
+                /* STEP 3: Payment & Screenshot Upload */
+                <div>
+                  <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Step 3: Payment & Confirmation</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Amount to pay: <span className="font-extrabold text-pink-700 text-sm">{session.price}</span> for {session.title}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setBookingStep("details")}
+                      type="button"
+                      className="text-xs font-semibold text-gray-500 hover:text-pink-600 underline"
+                    >
+                      Edit details
+                    </button>
+                  </div>
+
+                  {bookingError && (
+                    <div className="mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span>{bookingError}</span>
+                    </div>
+                  )}
+
+                  {uploadError && (
+                    <div className="mb-4 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>{uploadError}</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-5">
+                    {/* Booking summary pill */}
+                    <div className="p-3.5 rounded-2xl bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div>
+                        <span className="font-bold text-gray-800 block text-sm">{name}</span>
+                        <span className="text-gray-500">{phone} • {instagram}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2.5 py-1 rounded-full bg-pink-100 border border-pink-300 font-bold text-pink-800">
+                          {currentSelectedDay.dateStr} at {selectedTime}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Mobile 1-Tap Pay via PhonePe / UPI App */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-pink-200/90 shadow-sm text-center">
+                      <h4 className="text-sm font-bold text-gray-900 mb-1">
+                        Pay with PhonePe or Any UPI App
+                      </h4>
+                      <p className="text-xs text-gray-500 mb-4">
+                        Tap below on mobile to launch PhonePe / Google Pay / Paytm with exact amount ({session.price}):
+                      </p>
+
+                      <a
+                        href={upiDeepLink}
+                        className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:brightness-105 text-white font-bold text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <CreditCard className="w-4 h-4" />
+                        <span>⚡ Pay {session.price} via PhonePe / UPI App</span>
+                      </a>
+
+                      {/* Divider */}
+                      <div className="my-5 flex items-center justify-center gap-3">
+                        <div className="h-px bg-pink-100 flex-1" />
+                        <span className="text-[11px] font-bold text-pink-700 uppercase tracking-wider bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-200">
+                          OR SCAN QR CODE
+                        </span>
+                        <div className="h-px bg-pink-100 flex-1" />
+                      </div>
+
+                      {/* QR Code Container */}
+                      <div className="flex flex-col items-center">
+                        <div className="p-2.5 bg-white rounded-2xl border-2 border-pink-200 shadow-sm inline-block">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={qrCodeUrl}
+                            alt="PhonePe / UPI QR Code"
+                            className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-lg"
+                          />
+                        </div>
+                        <p className="text-[11px] text-gray-500 mt-2 font-medium">
+                          Scan with PhonePe, Google Pay, Paytm, or BHIM
+                        </p>
+
+                        {/* UPI ID Pill with Copy button */}
+                        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-pink-50 border border-pink-200 text-xs text-gray-700 font-mono">
+                          <span className="font-semibold text-pink-900">UPI ID:</span>
+                          <span>{UPI_ID}</span>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="ml-1 px-2 py-0.5 rounded-md bg-white border border-pink-300 text-[11px] font-semibold text-pink-700 hover:bg-pink-100 transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            {copiedUpi ? (
+                              <>
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span className="text-emerald-700">Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3 text-pink-600" />
+                                <span>Copy</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Screenshot Upload Form */}
+                    <form onSubmit={handleConfirmBooking} className="p-4 sm:p-5 rounded-2xl bg-white border border-pink-200/90 shadow-sm space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-800 mb-1.5 flex items-center justify-between">
+                          <span>Upload Payment Screenshot *</span>
+                          <span className="text-[11px] text-pink-700 font-normal">Required for confirmation</span>
+                        </label>
+
+                        {!paymentScreenshot ? (
+                          <label className="border-2 border-dashed border-pink-300 hover:border-pink-500 rounded-2xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer bg-pink-50/40 hover:bg-pink-50/70 transition-all text-center">
+                            <div className="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center shadow-xs">
+                              <Upload className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-gray-800">
+                                Tap or click to select payment screenshot
+                              </p>
+                              <p className="text-[11px] text-gray-500 mt-0.5">
+                                Mobile screenshot or camera (JPG, PNG, WebP)
+                              </p>
+                            </div>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleScreenshotChange}
+                              className="hidden"
+                            />
+                          </label>
+                        ) : (
+                          <div className="p-3 bg-pink-50/60 rounded-2xl border border-pink-200 flex items-center gap-3">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={paymentScreenshot}
+                              alt="Payment Screenshot Preview"
+                              className="w-14 h-14 object-cover rounded-xl border border-pink-300 shadow-xs"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-xs font-bold text-gray-900 truncate block">
+                                {paymentFileName || "Payment Screenshot"}
+                              </span>
+                              <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Attached successfully
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPaymentScreenshot(null);
+                                setPaymentFileName(null);
+                              }}
+                              className="px-2.5 py-1 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-semibold flex items-center gap-1 transition-all"
+                            >
+                              <X className="w-3 h-3" />
+                              <span>Remove</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Optional UTR Number */}
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="upi-utr">
+                          UPI Ref / UTR Number (Optional)
+                        </label>
+                        <input
+                          id="upi-utr"
+                          type="text"
+                          value={paymentUtr}
+                          onChange={(e) => setPaymentUtr(e.target.value)}
+                          placeholder="e.g. 12-digit transaction ID"
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all"
+                        />
+                      </div>
+
+                      <div className="pt-3 flex items-center justify-between gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setBookingStep("details")}
+                          className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:bg-gray-50"
+                        >
+                          Back
+                        </button>
+
+                        <button
+                          type="submit"
+                          disabled={submitting || !paymentScreenshot}
+                          className="flex-1 py-3 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Send className="w-4 h-4" />
+                          <span>
+                            {submitting
+                              ? "Verifying & Reserving..."
+                              : !paymentScreenshot
+                              ? "Upload Screenshot to Confirm"
+                              : `Confirm & Complete Booking (${session.price})`}
+                          </span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -687,7 +998,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
               type="button"
               onClick={() => {
                 setAlreadyBookedAlert(null);
-                if (isCheckoutStep) setIsCheckoutStep(false);
+                setBookingStep("slot");
               }}
               className="w-full py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:brightness-105 text-white font-semibold text-sm transition-all shadow-md"
             >

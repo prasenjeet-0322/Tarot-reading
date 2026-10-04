@@ -15,6 +15,9 @@ export interface BookingRecord {
   startMinutes?: number; // minutes from midnight (e.g. 1080 for 06:00 PM)
   endMinutes?: number; // e.g. 1090 for 06:10 PM
   durationMinutes?: number;
+  paymentScreenshot?: string; // base64 data URL
+  paymentUtr?: string; // UTR or Ref number
+  amount?: string; // e.g. "₹110"
 }
 
 const DATA_FILE = path.join(process.cwd(), "data", "bookings.json");
@@ -183,6 +186,9 @@ export async function addBooking(booking: {
   startMinutes?: number;
   endMinutes?: number;
   durationMinutes?: number;
+  paymentScreenshot?: string;
+  paymentUtr?: string;
+  amount?: string;
 }): Promise<{ record?: BookingRecord; error?: string }> {
   const start =
     booking.startMinutes ?? (booking.bookingTime ? timeToMinutes(booking.bookingTime) : 0);
@@ -209,6 +215,9 @@ export async function addBooking(booking: {
     startMinutes: start,
     endMinutes: end,
     durationMinutes: dur,
+    paymentScreenshot: booking.paymentScreenshot,
+    paymentUtr: booking.paymentUtr,
+    amount: booking.amount,
   };
 
   // 1. Persist locally immediately

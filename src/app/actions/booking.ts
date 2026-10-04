@@ -14,6 +14,9 @@ export async function submitBooking(data: {
   bookingDate?: string;
   bookingTime?: string;
   durationMinutes?: number;
+  paymentScreenshot?: string;
+  paymentUtr?: string;
+  amount?: string;
 }) {
   try {
     const startMinutes = data.bookingTime ? timeToMinutes(data.bookingTime) : 0;
@@ -30,6 +33,9 @@ export async function submitBooking(data: {
       startMinutes,
       endMinutes,
       durationMinutes: dur,
+      paymentScreenshot: data.paymentScreenshot,
+      paymentUtr: data.paymentUtr,
+      amount: data.amount,
     });
 
     if (result.error) {

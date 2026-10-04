@@ -11,6 +11,9 @@ import {
   Clock,
   RotateCcw,
   AlertCircle,
+  X,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 import { FaWhatsapp, FaInstagram } from "react-icons/fa";
 
@@ -23,6 +26,7 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [viewingScreenshotBooking, setViewingScreenshotBooking] = useState<BookingRecord | null>(null);
 
   const filteredBookings = bookings.filter((b) => {
     if (filter === "pending") return (b.status || "pending") === "pending";
@@ -142,11 +146,11 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
         <table className="w-full text-left border-collapse text-xs sm:text-sm table-fixed">
           <thead>
             <tr className="bg-pink-50/70 text-gray-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider border-b border-gray-200">
-              <th className="p-3 sm:p-4 w-[28%]">Client & Contact</th>
-              <th className="p-3 sm:p-4 w-[30%]">Booked Session & Slot</th>
-              <th className="p-3 sm:p-4 w-[16%] hidden md:table-cell">Submitted</th>
-              <th className="p-3 sm:p-4 w-[12%]">Status</th>
-              <th className="p-3 sm:p-4 w-[14%] text-right">Actions</th>
+              <th className="p-3 sm:p-4 w-[26%]">Client & Contact</th>
+              <th className="p-3 sm:p-4 w-[26%]">Booked Session & Slot</th>
+              <th className="p-3 sm:p-4 w-[18%]">Payment Proof</th>
+              <th className="p-3 sm:p-4 w-[15%] hidden md:table-cell">Submitted</th>
+              <th className="p-3 sm:p-4 w-[15%] text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -224,7 +228,36 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
                       </div>
                     </td>
 
-                    {/* 3. Submitted At (Visible on tablet/desktop) */}
+                    {/* 3. Payment Proof & Screenshot */}
+                    <td className="p-3 sm:p-4 align-top">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-bold text-xs text-pink-700">
+                          {booking.amount || "₹110"}
+                        </span>
+
+                        {booking.paymentScreenshot ? (
+                          <button
+                            type="button"
+                            onClick={() => setViewingScreenshotBooking(booking)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-100/90 hover:bg-pink-200 border border-pink-300 text-[11px] font-bold text-pink-800 transition-all cursor-pointer shadow-2xs w-fit"
+                            title="Click to view payment screenshot proof"
+                          >
+                            <Eye className="w-3 h-3 text-pink-600 shrink-0" />
+                            <span>View Proof</span>
+                          </button>
+                        ) : (
+                          <span className="text-[11px] text-gray-400 italic">No proof</span>
+                        )}
+
+                        {booking.paymentUtr && (
+                          <span className="text-[10px] text-gray-500 font-mono truncate max-w-[130px]" title={booking.paymentUtr}>
+                            Ref: {booking.paymentUtr}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* 4. Submitted At (Visible on tablet/desktop) */}
                     <td className="p-3 sm:p-4 align-top hidden md:table-cell text-xs text-gray-600">
                       <div className="flex items-center gap-1 font-medium text-gray-800">
                         <Calendar className="w-3 h-3 text-pink-500 shrink-0" />
@@ -308,6 +341,78 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
           </tbody>
         </table>
       </div>
+
+      {/* Payment Proof Screenshot Modal Dialog */}
+      {viewingScreenshotBooking && (
+        <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 max-w-lg w-full shadow-2xl border border-pink-200 animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+              <div>
+                <h4 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <span>Payment Proof</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-800 font-bold">
+                    {viewingScreenshotBooking.amount || "Paid"}
+                  </span>
+                </h4>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Client: <span className="font-semibold text-gray-800">{viewingScreenshotBooking.name}</span> ({viewingScreenshotBooking.email})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingScreenshotBooking(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center cursor-pointer transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Screenshot Image Container */}
+            <div className="flex-1 overflow-auto rounded-2xl border border-pink-100 bg-pink-50/30 p-2 flex items-center justify-center min-h-[220px]">
+              {viewingScreenshotBooking.paymentScreenshot ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={viewingScreenshotBooking.paymentScreenshot}
+                  alt="Payment Screenshot Proof"
+                  className="max-h-[55vh] w-auto object-contain rounded-xl shadow-sm"
+                />
+              ) : (
+                <p className="text-xs text-gray-400 italic">No screenshot image available.</p>
+              )}
+            </div>
+
+            {viewingScreenshotBooking.paymentUtr && (
+              <div className="mt-3 p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-700 font-mono">
+                <span className="font-bold text-gray-900">UTR / Reference No:</span> {viewingScreenshotBooking.paymentUtr}
+              </div>
+            )}
+
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
+              {viewingScreenshotBooking.email && (
+                <a
+                  href={`https://wa.me/${viewingScreenshotBooking.email.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(
+                    viewingScreenshotBooking.name
+                  )}!%20This%20is%20SoftTarotGirl.%20I%20have%20verified%20your%20payment%20proof%20and%20your%20tarot%20reading%20slot%20is%20confirmed.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                >
+                  <FaWhatsapp className="w-4 h-4" />
+                  <span>Confirm on WhatsApp</span>
+                </a>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setViewingScreenshotBooking(null)}
+                className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 cursor-pointer transition-all ml-auto"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
