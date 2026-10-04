@@ -205,7 +205,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "softtarotgirl@upi";
+  const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "7439630848@ybl";
   const UPI_PAYEE_NAME = "SoftTarotGirl";
   const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${session.priceValue}&cu=INR&tn=${encodeURIComponent(`Tarot-${session.title}`)}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=${encodeURIComponent(upiDeepLink)}`;
