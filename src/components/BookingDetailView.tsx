@@ -397,7 +397,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
 
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-100 shadow-md">
         <AnimatePresence mode="wait">
-          {!isCheckoutStep ? (
+          {bookingStep === "slot" ? (
             /* STEP 1: Session Details & Slot Picker (Matches Image 2) */
             <motion.div
               key="slot-selection"
