@@ -100,41 +100,77 @@ export function extractAmountFromBooking(b: any): string | undefined {
   return "₹110";
 }
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __tarotBookings: BookingRecord[] | undefined;
+}
+
+const TMP_DATA_FILE = path.join("/tmp", "tarot_bookings.json");
+
 function getLocalBookings(): BookingRecord[] {
+  let list: BookingRecord[] = [];
+
+  // 1. Try reading from /tmp on serverless
   try {
-    if (!fs.existsSync(DATA_FILE)) {
-      return [];
+    if (fs.existsSync(TMP_DATA_FILE)) {
+      const raw = fs.readFileSync(TMP_DATA_FILE, "utf-8");
+      list = JSON.parse(raw);
     }
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    const list: BookingRecord[] = JSON.parse(raw);
-    return list.map((b) => ({
-      ...b,
-      status: b.status || "pending",
-      bookingDate: extractDateFromBooking(b),
-      bookingTime: extractTimeFromBooking(b),
-      durationMinutes: extractDurationFromBooking(b),
-      paymentScreenshot: extractScreenshotFromBooking(b),
-      paymentUtr: extractUtrFromBooking(b),
-      amount: extractAmountFromBooking(b),
-      startMinutes: b.startMinutes ?? timeToMinutes(extractTimeFromBooking(b)),
-      endMinutes:
-        b.endMinutes ??
-        timeToMinutes(extractTimeFromBooking(b)) + extractDurationFromBooking(b),
-    }));
-  } catch {
-    return [];
+  } catch {}
+
+  // 2. If empty, try reading from repo DATA_FILE
+  if (!list || list.length === 0) {
+    try {
+      if (fs.existsSync(DATA_FILE)) {
+        const raw = fs.readFileSync(DATA_FILE, "utf-8");
+        list = JSON.parse(raw);
+      }
+    } catch {}
   }
+
+  // 3. Fallback to in-memory global cache
+  if ((!list || list.length === 0) && globalThis.__tarotBookings && globalThis.__tarotBookings.length > 0) {
+    list = globalThis.__tarotBookings;
+  }
+
+  const normalized = (list || []).map((b) => ({
+    ...b,
+    status: b.status || "pending",
+    bookingDate: extractDateFromBooking(b),
+    bookingTime: extractTimeFromBooking(b),
+    durationMinutes: extractDurationFromBooking(b),
+    paymentScreenshot: extractScreenshotFromBooking(b),
+    paymentUtr: extractUtrFromBooking(b),
+    amount: extractAmountFromBooking(b),
+    startMinutes: b.startMinutes ?? timeToMinutes(extractTimeFromBooking(b)),
+    endMinutes:
+      b.endMinutes ??
+      timeToMinutes(extractTimeFromBooking(b)) + extractDurationFromBooking(b),
+  }));
+
+  globalThis.__tarotBookings = normalized;
+  return normalized;
 }
 
 function saveLocalBookings(bookings: BookingRecord[]) {
+  globalThis.__tarotBookings = bookings;
+
+  // Try writing to DATA_FILE (local dev)
   try {
     const dir = path.dirname(DATA_FILE);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2), "utf-8");
-  } catch (err) {
-    console.error("Failed to write bookings to disk:", err);
+  } catch {
+    // Expected on read-only serverless filesystems
+  }
+
+  // Always write to /tmp on serverless (Vercel)
+  try {
+    fs.writeFileSync(TMP_DATA_FILE, JSON.stringify(bookings, null, 2), "utf-8");
+  } catch {
+    // Graceful ignore
   }
 }
 

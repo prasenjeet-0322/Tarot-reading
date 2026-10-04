@@ -146,10 +146,11 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
         <table className="w-full text-left border-collapse text-xs sm:text-sm table-fixed">
           <thead>
             <tr className="bg-pink-50/70 text-gray-700 text-[11px] sm:text-xs font-bold uppercase tracking-wider border-b border-gray-200">
-              <th className="p-3 sm:p-4 w-[26%]">Client & Contact</th>
-              <th className="p-3 sm:p-4 w-[26%]">Booked Session & Slot</th>
-              <th className="p-3 sm:p-4 w-[18%]">Payment Proof</th>
-              <th className="p-3 sm:p-4 w-[15%] hidden md:table-cell">Submitted</th>
+              <th className="p-3 sm:p-4 w-[24%]">Client & Contact</th>
+              <th className="p-3 sm:p-4 w-[24%]">Booked Session & Slot</th>
+              <th className="p-3 sm:p-4 w-[15%]">Payment Proof</th>
+              <th className="p-3 sm:p-4 w-[12%] hidden md:table-cell">Submitted</th>
+              <th className="p-3 sm:p-4 w-[10%]">Status</th>
               <th className="p-3 sm:p-4 w-[15%] text-right">Actions</th>
             </tr>
           </thead>
@@ -332,7 +333,7 @@ export function AdminBookingsTable({ initialBookings }: AdminBookingsTableProps)
               })
             ) : (
               <tr>
-                <td colSpan={5} className="p-12 text-center text-gray-400 italic">
+                <td colSpan={6} className="p-12 text-center text-gray-400 italic">
                   <span className="text-3xl block mb-2">🔮</span>
                   No bookings found in this view.
                 </td>
