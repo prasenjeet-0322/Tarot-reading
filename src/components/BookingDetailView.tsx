@@ -206,10 +206,13 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [desktopNotice, setDesktopNotice] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
 
   const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "7439630848@ybl";
-  const UPI_PAYEE_NAME = "SoftTarotGirl";
-  const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${session.priceValue}&cu=INR&tn=${encodeURIComponent(`Tarot-${session.title}`)}`;
+  const UPI_PAYEE_NAME = "PRAGYA MONDAL";
+  const UPI_PHONE_NUMBER = "7439630848";
+  // Clean standard UPI link without long commercial notes that trigger bank fraud filters
+  const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${session.priceValue}&cu=INR`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=${encodeURIComponent(upiDeepLink)}`;
 
   // Helper to check if a specific time slot is booked (including 10 min break buffer)
@@ -309,6 +312,14 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
       navigator.clipboard.writeText(UPI_ID);
       setCopiedUpi(true);
       setTimeout(() => setCopiedUpi(false), 2000);
+    }
+  };
+
+  const handleCopyPhone = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(UPI_PHONE_NUMBER);
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 2000);
     }
   };
 
@@ -875,27 +886,64 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                           Scan with PhonePe, Google Pay, Paytm, or BHIM
                         </p>
 
-                        {/* UPI ID Pill with Copy button */}
-                        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-pink-50 border border-pink-200 text-xs text-gray-700 font-mono">
-                          <span className="font-semibold text-pink-900">UPI ID:</span>
-                          <span>{UPI_ID}</span>
-                          <button
-                            type="button"
-                            onClick={handleCopyUpi}
-                            className="ml-1 px-2 py-0.5 rounded-md bg-white border border-pink-300 text-[11px] font-semibold text-pink-700 hover:bg-pink-100 transition-all flex items-center gap-1 cursor-pointer"
-                          >
-                            {copiedUpi ? (
-                              <>
-                                <Check className="w-3 h-3 text-emerald-600" />
-                                <span className="text-emerald-700">Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3 text-pink-600" />
-                                <span>Copy</span>
-                              </>
-                            )}
-                          </button>
+                        {/* Payee Name & Copy details */}
+                        <div className="mt-3 flex flex-col items-center gap-2">
+                          {/* Registered Account Name */}
+                          <div className="text-[11px] text-gray-500 font-medium">
+                            Account Name: <span className="font-bold text-gray-900">{UPI_PAYEE_NAME}</span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center justify-center gap-2">
+                            {/* UPI ID Pill with Copy button */}
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-pink-50 border border-pink-200 text-xs text-gray-700 font-mono">
+                              <span className="font-semibold text-pink-900">UPI ID:</span>
+                              <span>{UPI_ID}</span>
+                              <button
+                                type="button"
+                                onClick={handleCopyUpi}
+                                className="ml-1 px-2 py-0.5 rounded-md bg-white border border-pink-300 text-[11px] font-semibold text-pink-700 hover:bg-pink-100 transition-all flex items-center gap-1 cursor-pointer"
+                              >
+                                {copiedUpi ? (
+                                  <>
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                    <span className="text-emerald-700">Copied!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3 h-3 text-pink-600" />
+                                    <span>Copy</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+
+                            {/* PhonePe Number Pill */}
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-xs text-gray-700 font-mono">
+                              <span className="font-semibold text-purple-900">PhonePe No:</span>
+                              <span>{UPI_PHONE_NUMBER}</span>
+                              <button
+                                type="button"
+                                onClick={handleCopyPhone}
+                                className="ml-1 px-2 py-0.5 rounded-md bg-white border border-purple-300 text-[11px] font-semibold text-purple-700 hover:bg-purple-100 transition-all flex items-center gap-1 cursor-pointer"
+                              >
+                                {copiedPhone ? (
+                                  <>
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                    <span className="text-emerald-700">Copied!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3 h-3 text-purple-600" />
+                                    <span>Copy</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          <p className="text-[10px] text-gray-400 max-w-xs text-center mt-1">
+                            💡 If you are testing with the same phone number linked to this UPI ID, UPI security blocks self-payments. Please test with another account or scan the QR code directly.
+                          </p>
                         </div>
                       </div>
                     </div>
