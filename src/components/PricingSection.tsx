@@ -95,7 +95,6 @@ export function PricingSection() {
             <div className="flex-1 flex flex-col items-center justify-center py-8">
               <div className="text-center mb-8">
                 <span className="text-5xl font-bold text-[#D4AF37]">₹35</span>
-                <span className="text-gray-400 text-lg ml-2">card</span>
               </div>
               <ul className="space-y-4 w-full">
                 {[

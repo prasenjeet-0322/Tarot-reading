@@ -31,11 +31,16 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
 
       {/* SECTION 1: Voice Call Readings */}
       <div className="mb-10">
-        <div className="flex items-center gap-2.5 mb-4">
-          <span className="text-xl select-none">🕯️</span>
-          <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800">
-            Live Voice Divinations
-          </h3>
+        <div className="flex flex-wrap items-center justify-between gap-2.5 mb-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl select-none">🕯️</span>
+            <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800">
+              Live Voice Divinations
+            </h3>
+          </div>
+          <span className="text-xs font-semibold text-pink-700 bg-pink-50/90 border border-pink-200/90 px-3 py-1 rounded-full shadow-xs">
+            💬 Can also be done in the message with voice call
+          </span>
         </div>
 
         {/* Grid of Voice Call Sessions styled as Witchy Tarot Cards */}
@@ -197,9 +202,6 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
 
                 {/* Price & CTA */}
                 <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                  <div className="text-right">
-                    <span className="text-xs sm:text-sm text-gray-500 font-medium block">/ Tarot Card</span>
-                  </div>
                   <button
                     type="button"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-purple-800 text-white font-bold text-sm shadow-md hover:shadow-pink-300/60 hover:brightness-110 active:scale-95 transition-all"
