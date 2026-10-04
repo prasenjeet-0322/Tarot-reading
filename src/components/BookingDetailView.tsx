@@ -837,114 +837,97 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                     </div>
 
                     {/* Mobile 1-Tap Pay via PhonePe / UPI App */}
-                    <div id="upi-qr-card" className="p-4 sm:p-5 rounded-2xl bg-white border border-pink-200/90 shadow-sm text-center">
-                      <h4 className="text-sm font-bold text-gray-900 mb-1">
-                        Pay with PhonePe or Any UPI App
+                    {/* Reliable Payment Methods Card */}
+                    <div id="upi-qr-card" className="p-5 sm:p-6 rounded-3xl bg-white border border-pink-200/90 shadow-sm text-center">
+                      <div className="inline-block px-3 py-1 rounded-full bg-pink-100 text-pink-800 text-xs font-bold mb-3 border border-pink-200">
+                        ⚡ Total Amount: {session.price}
+                      </div>
+
+                      <h4 className="text-base font-bold text-gray-900 mb-1">
+                        Choose Your Preferred Payment Method
                       </h4>
-                      <p className="text-xs text-gray-500 mb-4">
-                        Tap below on mobile to launch PhonePe / Google Pay / Paytm with exact amount ({session.price}):
+                      <p className="text-xs text-gray-500 max-w-sm mx-auto mb-5">
+                        Scan the QR code or use the PhonePe number / UPI ID below, then upload the payment screenshot to confirm:
                       </p>
 
-                      <button
-                        type="button"
-                        onClick={handlePayViaUpi}
-                        className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:brightness-105 text-white font-bold text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <CreditCard className="w-4 h-4" />
-                        <span>⚡ Pay {session.price} via PhonePe / UPI App</span>
-                      </button>
-
-                      {desktopNotice && (
-                        <div className="mt-3.5 p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 text-left flex items-start gap-2 animate-in fade-in duration-200">
-                          <span className="text-base select-none">💻</span>
-                          <span>
-                            <strong>You are on a desktop / laptop:</strong> UPI apps cannot open directly on PC. Please scan the QR code below using PhonePe, Google Pay, or Paytm on your mobile phone!
-                          </span>
+                      {/* Primary: QR Code Container */}
+                      <div className="p-4 bg-pink-50/40 rounded-2xl border border-pink-200 max-w-xs mx-auto mb-5 flex flex-col items-center">
+                        <div className="p-2.5 bg-white rounded-xl border border-pink-200 shadow-xs inline-block">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={qrCodeUrl}
+                            alt="PhonePe / UPI QR Code"
+                            className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg"
+                          />
                         </div>
-                      )}
+                        <span className="text-xs font-bold text-gray-800 mt-2.5">
+                          Scan with PhonePe, GPay, or Paytm
+                        </span>
+                        <span className="text-[11px] text-gray-500">
+                          Account: <strong className="text-gray-900">{UPI_PAYEE_NAME}</strong>
+                        </span>
+                      </div>
 
                       {/* Divider */}
                       <div className="my-5 flex items-center justify-center gap-3">
                         <div className="h-px bg-pink-100 flex-1" />
                         <span className="text-[11px] font-bold text-pink-700 uppercase tracking-wider bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-200">
-                          OR SCAN QR CODE
+                          OR PAY TO PHONEPE NUMBER / UPI ID
                         </span>
                         <div className="h-px bg-pink-100 flex-1" />
                       </div>
 
-                      {/* QR Code Container */}
-                      <div className="flex flex-col items-center">
-                        <div className="p-2.5 bg-white rounded-2xl border-2 border-pink-200 shadow-sm inline-block">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={qrCodeUrl}
-                            alt="PhonePe / UPI QR Code"
-                            className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-lg"
-                          />
-                        </div>
-                        <p className="text-[11px] text-gray-500 mt-2 font-medium">
-                          Scan with PhonePe, Google Pay, Paytm, or BHIM
-                        </p>
-
-                        {/* Payee Name & Copy details */}
-                        <div className="mt-3 flex flex-col items-center gap-2">
-                          {/* Registered Account Name */}
-                          <div className="text-[11px] text-gray-500 font-medium">
-                            Account Name: <span className="font-bold text-gray-900">{UPI_PAYEE_NAME}</span>
+                      {/* 2 Easy Direct Transfer Options */}
+                      <div className="space-y-3 max-w-sm mx-auto text-left">
+                        {/* Option 1: PhonePe Number */}
+                        <div className="p-3 rounded-2xl bg-purple-50/80 border border-purple-200 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider block">
+                              PhonePe Mobile Number
+                            </span>
+                            <span className="text-sm font-bold font-mono text-gray-900 block truncate">
+                              {UPI_PHONE_NUMBER}
+                            </span>
+                            <span className="text-[11px] text-gray-500">
+                              {UPI_PAYEE_NAME}
+                            </span>
                           </div>
-
-                          <div className="flex flex-wrap items-center justify-center gap-2">
-                            {/* UPI ID Pill with Copy button */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-pink-50 border border-pink-200 text-xs text-gray-700 font-mono">
-                              <span className="font-semibold text-pink-900">UPI ID:</span>
-                              <span>{UPI_ID}</span>
-                              <button
-                                type="button"
-                                onClick={handleCopyUpi}
-                                className="ml-1 px-2 py-0.5 rounded-md bg-white border border-pink-300 text-[11px] font-semibold text-pink-700 hover:bg-pink-100 transition-all flex items-center gap-1 cursor-pointer"
-                              >
-                                {copiedUpi ? (
-                                  <>
-                                    <Check className="w-3 h-3 text-emerald-600" />
-                                    <span className="text-emerald-700">Copied!</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-3 h-3 text-pink-600" />
-                                    <span>Copy</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-
-                            {/* PhonePe Number Pill */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-xs text-gray-700 font-mono">
-                              <span className="font-semibold text-purple-900">PhonePe No:</span>
-                              <span>{UPI_PHONE_NUMBER}</span>
-                              <button
-                                type="button"
-                                onClick={handleCopyPhone}
-                                className="ml-1 px-2 py-0.5 rounded-md bg-white border border-purple-300 text-[11px] font-semibold text-purple-700 hover:bg-purple-100 transition-all flex items-center gap-1 cursor-pointer"
-                              >
-                                {copiedPhone ? (
-                                  <>
-                                    <Check className="w-3 h-3 text-emerald-600" />
-                                    <span className="text-emerald-700">Copied!</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-3 h-3 text-purple-600" />
-                                    <span>Copy</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </div>
-
-                          <p className="text-[10px] text-gray-400 max-w-xs text-center mt-1">
-                            💡 If you are testing with the same phone number linked to this UPI ID, UPI security blocks self-payments. Please test with another account or scan the QR code directly.
-                          </p>
+                          <button
+                            type="button"
+                            onClick={handleCopyPhone}
+                            className="px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+                          >
+                            {copiedPhone ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedPhone ? "Copied!" : "Copy"}</span>
+                          </button>
                         </div>
+
+                        {/* Option 2: UPI ID */}
+                        <div className="p-3 rounded-2xl bg-pink-50/80 border border-pink-200 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-bold text-pink-700 uppercase tracking-wider block">
+                              UPI ID
+                            </span>
+                            <span className="text-sm font-bold font-mono text-gray-900 block truncate">
+                              {UPI_ID}
+                            </span>
+                            <span className="text-[11px] text-gray-500">
+                              {UPI_PAYEE_NAME}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="px-3.5 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+                          >
+                            {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedUpi ? "Copied!" : "Copy"}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-[11px] text-amber-900 max-w-sm mx-auto text-left">
+                        <strong>📌 Note for testing:</strong> Indian banks (NPCI) do not permit paying to your own phone number/bank account. Please test with a friend or different phone number, and it will succeed!
                       </div>
                     </div>
 
