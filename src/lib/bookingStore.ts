@@ -62,6 +62,44 @@ function extractDurationFromBooking(b: BookingRecord): number {
   return 15;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function extractScreenshotFromBooking(b: any): string | undefined {
+  if (b.paymentScreenshot) return b.paymentScreenshot;
+  if (b.payment_screenshot) return b.payment_screenshot;
+  if (b.question && typeof b.question === "string" && b.question.includes("PaymentScreenshotBase64:")) {
+    const match = b.question.match(/PaymentScreenshotBase64:\s*([^\n\r]+)/);
+    if (match) return match[1].trim();
+  }
+  return undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function extractUtrFromBooking(b: any): string | undefined {
+  if (b.paymentUtr) return b.paymentUtr;
+  if (b.payment_utr) return b.payment_utr;
+  if (b.question && typeof b.question === "string") {
+    const match = b.question.match(/(?:UTR|Ref):\s*([^\n\r]+)/i);
+    if (match) return match[1].trim();
+  }
+  return undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function extractAmountFromBooking(b: any): string | undefined {
+  if (b.amount) return b.amount;
+  if (b.question && typeof b.question === "string") {
+    const match = b.question.match(/Amount:\s*(₹?\d+)/i);
+    if (match) return match[1].trim();
+  }
+  const plan = (b.plan || "").toLowerCase();
+  if (plan.includes("10 min")) return "₹110";
+  if (plan.includes("20 min")) return "₹199";
+  if (plan.includes("30 min")) return "₹249";
+  if (plan.includes("1 hour") || plan.includes("60 min")) return "₹499";
+  if (plan.includes("card")) return "₹35";
+  return "₹110";
+}
+
 function getLocalBookings(): BookingRecord[] {
   try {
     if (!fs.existsSync(DATA_FILE)) {
@@ -75,6 +113,9 @@ function getLocalBookings(): BookingRecord[] {
       bookingDate: extractDateFromBooking(b),
       bookingTime: extractTimeFromBooking(b),
       durationMinutes: extractDurationFromBooking(b),
+      paymentScreenshot: extractScreenshotFromBooking(b),
+      paymentUtr: extractUtrFromBooking(b),
+      amount: extractAmountFromBooking(b),
       startMinutes: b.startMinutes ?? timeToMinutes(extractTimeFromBooking(b)),
       endMinutes:
         b.endMinutes ??
@@ -225,108 +266,125 @@ export async function addBooking(booking: {
   current.unshift(newRecord);
   saveLocalBookings(current);
 
-  // 2. Also try Supabase safely in background if configured and online
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (url && !url.includes("placeholder")) {
-      const supaPromise = supabaseAdmin.from("bookings").insert([
-        {
-          name: booking.name,
-          email: booking.email,
-          plan: booking.plan,
-          question: booking.question,
-        },
-      ]);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Supabase timeout")), 1500)
-      );
-      await Promise.race([supaPromise, timeoutPromise]);
-    }
-  } catch {
-    // Network or DNS error gracefully ignored since data is safely stored locally
-  }
+    // 2. Also try Supabase safely in background if configured and online
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (url && !url.includes("placeholder")) {
+        let supaNotes = booking.question || "";
+        if (booking.amount) supaNotes += `\nAmount: ${booking.amount}`;
+        if (booking.paymentUtr) supaNotes += `\nUTR: ${booking.paymentUtr}`;
+        if (booking.paymentScreenshot) supaNotes += `\nPaymentScreenshotBase64: ${booking.paymentScreenshot}`;
 
-  return { record: newRecord };
-}
-
-export async function deleteBookingRecord(id: string): Promise<boolean> {
-  const current = getLocalBookings();
-  const updated = current.filter((b) => b.id !== id);
-  saveLocalBookings(updated);
-
-  // Also attempt Supabase deletion if connected
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (url && !url.includes("placeholder")) {
-      const supaPromise = supabaseAdmin.from("bookings").delete().eq("id", id);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Supabase timeout")), 1500)
-      );
-      await Promise.race([supaPromise, timeoutPromise]);
-    }
-  } catch {
-    // Fallback handled locally
-  }
-
-  return true;
-}
-
-export async function toggleBookingStatusRecord(id: string): Promise<BookingRecord | null> {
-  const current = getLocalBookings();
-  let updatedRecord: BookingRecord | null = null;
-
-  const updated = current.map((b) => {
-    if (b.id === id) {
-      const nextStatus: "pending" | "completed" = b.status === "completed" ? "pending" : "completed";
-      updatedRecord = { ...b, status: nextStatus };
-      return updatedRecord;
-    }
-    return b;
-  });
-
-  saveLocalBookings(updated);
-  return updatedRecord;
-}
-
-export async function getAllBookings(): Promise<{ data: BookingRecord[]; error: string | null }> {
-  const local = getLocalBookings();
-
-  // Try Supabase if reachable, with quick fallback to local storage
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (url && !url.includes("placeholder")) {
-      const supaPromise = supabaseAdmin
-        .from("bookings")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Supabase timeout")), 1500)
-      );
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res = (await Promise.race([supaPromise, timeoutPromise])) as any;
-      if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
-        const mergedMap = new Map<string, BookingRecord>();
-        for (const item of local) {
-          mergedMap.set(item.id, item);
-        }
-        for (const item of res.data) {
-          const existing = mergedMap.get(item.id || item.created_at);
-          mergedMap.set(item.id || item.created_at, {
-            ...item,
-            status: existing?.status || item.status || "pending",
-          });
-        }
-        const sorted = Array.from(mergedMap.values()).sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        const supaPromise = supabaseAdmin.from("bookings").insert([
+          {
+            name: booking.name,
+            email: booking.email,
+            plan: booking.plan,
+            question: supaNotes,
+          },
+        ]);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Supabase timeout")), 2500)
         );
-        return { data: sorted, error: null };
+        await Promise.race([supaPromise, timeoutPromise]);
       }
+    } catch {
+      // Network or DNS error gracefully ignored since data is safely stored locally
     }
-  } catch {
-    // Fallback to local data
+
+    return { record: newRecord };
   }
+
+  export async function deleteBookingRecord(id: string): Promise<boolean> {
+    const current = getLocalBookings();
+    const updated = current.filter((b) => b.id !== id);
+    saveLocalBookings(updated);
+
+    // Also attempt Supabase deletion if connected
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (url && !url.includes("placeholder")) {
+        const supaPromise = supabaseAdmin.from("bookings").delete().eq("id", id);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Supabase timeout")), 1500)
+        );
+        await Promise.race([supaPromise, timeoutPromise]);
+      }
+    } catch {
+      // Fallback handled locally
+    }
+
+    return true;
+  }
+
+  export async function toggleBookingStatusRecord(id: string): Promise<BookingRecord | null> {
+    const current = getLocalBookings();
+    let updatedRecord: BookingRecord | null = null;
+
+    const updated = current.map((b) => {
+      if (b.id === id) {
+        const nextStatus: "pending" | "completed" = b.status === "completed" ? "pending" : "completed";
+        updatedRecord = { ...b, status: nextStatus };
+        return updatedRecord;
+      }
+      return b;
+    });
+
+    saveLocalBookings(updated);
+    return updatedRecord;
+  }
+
+  export async function getAllBookings(): Promise<{ data: BookingRecord[]; error: string | null }> {
+    const local = getLocalBookings();
+
+    // Try Supabase if reachable, with quick fallback to local storage
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (url && !url.includes("placeholder")) {
+        const supaPromise = supabaseAdmin
+          .from("bookings")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Supabase timeout")), 2500)
+        );
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const res = (await Promise.race([supaPromise, timeoutPromise])) as any;
+        if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
+          const mergedMap = new Map<string, BookingRecord>();
+          for (const item of local) {
+            mergedMap.set(item.id, item);
+          }
+          for (const item of res.data) {
+            const existing = mergedMap.get(item.id || item.created_at);
+            const screenshot = extractScreenshotFromBooking(item) || existing?.paymentScreenshot;
+            const utr = extractUtrFromBooking(item) || existing?.paymentUtr;
+            const amt = extractAmountFromBooking(item) || existing?.amount;
+
+            mergedMap.set(item.id || item.created_at, {
+              ...item,
+              status: existing?.status || item.status || "pending",
+              bookingDate: extractDateFromBooking(item) || existing?.bookingDate,
+              bookingTime: extractTimeFromBooking(item) || existing?.bookingTime,
+              durationMinutes: extractDurationFromBooking(item) || existing?.durationMinutes,
+              startMinutes: item.startMinutes ?? existing?.startMinutes ?? timeToMinutes(extractTimeFromBooking(item)),
+              endMinutes: item.endMinutes ?? existing?.endMinutes ?? (timeToMinutes(extractTimeFromBooking(item)) + extractDurationFromBooking(item)),
+              paymentScreenshot: screenshot,
+              paymentUtr: utr,
+              amount: amt,
+            });
+          }
+          const sorted = Array.from(mergedMap.values()).sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+          return { data: sorted, error: null };
+        }
+      }
+    } catch {
+      // Fallback to local data
+    }
 
   return { data: local, error: null };
 }
