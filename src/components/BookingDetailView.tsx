@@ -205,6 +205,8 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const [desktopNotice, setDesktopNotice] = useState(false);
+
   const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "7439630848@ybl";
   const UPI_PAYEE_NAME = "SoftTarotGirl";
   const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${session.priceValue}&cu=INR&tn=${encodeURIComponent(`Tarot-${session.title}`)}`;
@@ -307,6 +309,24 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
       navigator.clipboard.writeText(UPI_ID);
       setCopiedUpi(true);
       setTimeout(() => setCopiedUpi(false), 2000);
+    }
+  };
+
+  const handlePayViaUpi = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window === "undefined") return;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Launch UPI app on mobile devices
+      window.location.href = upiDeepLink;
+    } else {
+      // On desktop PCs / laptops, browsers crash if navigating to upi://
+      // So show a clear guide to scan the QR code with their mobile phone!
+      setDesktopNotice(true);
+      const el = document.getElementById("upi-qr-card");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -806,7 +826,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                     </div>
 
                     {/* Mobile 1-Tap Pay via PhonePe / UPI App */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-pink-200/90 shadow-sm text-center">
+                    <div id="upi-qr-card" className="p-4 sm:p-5 rounded-2xl bg-white border border-pink-200/90 shadow-sm text-center">
                       <h4 className="text-sm font-bold text-gray-900 mb-1">
                         Pay with PhonePe or Any UPI App
                       </h4>
@@ -814,13 +834,23 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         Tap below on mobile to launch PhonePe / Google Pay / Paytm with exact amount ({session.price}):
                       </p>
 
-                      <a
-                        href={upiDeepLink}
+                      <button
+                        type="button"
+                        onClick={handlePayViaUpi}
                         className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:brightness-105 text-white font-bold text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <CreditCard className="w-4 h-4" />
                         <span>⚡ Pay {session.price} via PhonePe / UPI App</span>
-                      </a>
+                      </button>
+
+                      {desktopNotice && (
+                        <div className="mt-3.5 p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 text-left flex items-start gap-2 animate-in fade-in duration-200">
+                          <span className="text-base select-none">💻</span>
+                          <span>
+                            <strong>You are on a desktop / laptop:</strong> UPI apps cannot open directly on PC. Please scan the QR code below using PhonePe, Google Pay, or Paytm on your mobile phone!
+                          </span>
+                        </div>
+                      )}
 
                       {/* Divider */}
                       <div className="my-5 flex items-center justify-center gap-3">
