@@ -184,13 +184,10 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
                     {session.icon}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="mb-1">
                       <h4 className="text-base sm:text-lg font-serif font-bold text-gray-900 group-hover:text-pink-700 transition-colors">
                         {session.title}
                       </h4>
-                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full shadow-xs">
-                        {session.badge?.text}
-                      </span>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-light max-w-xl">
                       {session.description}

@@ -97,10 +97,6 @@ export const TAROT_SESSIONS: TarotSession[] = [
     priceValue: 35,
     category: "card",
     icon: "🃏",
-    badge: {
-      text: "✨ ₹35 / Arcana Card",
-      type: "popular",
-    },
     description:
       "Sacred card pulls with personalized intuitive audio whispers, written interpretations, and high-resolution photos of your drawn cards sent directly to WhatsApp!",
     detailedDescription:
