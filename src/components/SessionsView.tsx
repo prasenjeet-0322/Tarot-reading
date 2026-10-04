@@ -201,14 +201,13 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
                 {/* Price & CTA */}
                 <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
                   <div className="text-right">
-                    <span className="text-xl sm:text-2xl font-serif font-black text-pink-700">₹35</span>
-                    <span className="text-[11px] text-pink-900/60 font-medium block">/ Tarot Card</span>
+                    <span className="text-xs sm:text-sm text-gray-500 font-medium block">/ Tarot Card</span>
                   </div>
                   <button
                     type="button"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-purple-800 text-white font-bold text-sm shadow-md hover:shadow-pink-300/60 hover:brightness-110 active:scale-95 transition-all"
                   >
-                    <span>Divine Pull</span>
+                    <span className="tracking-wide">{session.price}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                 </div>
