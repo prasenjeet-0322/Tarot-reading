@@ -59,12 +59,8 @@ export default function Home() {
             </a>
           </div>
 
-          <p className="flex items-center gap-1.5 font-light text-pink-900/80">
-            <span>🔮</span>
-            <span className="font-serif italic">As Above, So Below</span>
-            <span>•</span>
-            <span>SoftTarotGirl • Sacred Divinations & Intuitive Sanctuary</span>
-            <span>✨</span>
+          <p className="text-center font-light text-pink-900/80 text-xs max-w-sm leading-relaxed">
+            SoftTarotGirl • Sacred Divinations & Intuitive Sanctuary ✨
           </p>
         </footer>
       </div>
