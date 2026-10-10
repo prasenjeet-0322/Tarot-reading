@@ -90,7 +90,7 @@ export const TAROT_SESSIONS: TarotSession[] = [
   },
   {
     id: "card-reading-35",
-    title: "Arcana Card Readings",
+    title: "1 Card Reading",
     duration: "Per Card",
     contactType: "WhatsApp Audio + Photos",
     price: "₹35",

@@ -153,7 +153,7 @@ export function SessionsView({ onSelectSession }: SessionsViewProps) {
         <div className="flex items-center gap-2.5 mb-4">
           <span className="text-xl select-none">🃏</span>
           <h3 className="text-base sm:text-lg font-serif font-bold text-gray-800">
-            Sacred Arcana Pulls
+            1 Card Reading
           </h3>
         </div>
 
