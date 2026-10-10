@@ -760,7 +760,7 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         required
                         value={instagram}
                         onChange={(e) => setInstagram(e.target.value)}
-                        placeholder="e.g. @mystic_aurora"
+                        placeholder="e.g. @softarotgirl"
                         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all"
                       />
                     </div>
@@ -770,21 +770,21 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                       <span>Questions will be channeled and discussed directly during your voice call or WhatsApp session.</span>
                     </div>
 
-                    <div className="pt-4 flex items-center justify-between gap-4">
+                    <div className="pt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                       <button
                         type="button"
                         onClick={() => setBookingStep("slot")}
-                        className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:bg-gray-50"
+                        className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:bg-gray-50 text-center"
                       >
                         Back
                       </button>
 
                       <button
                         type="submit"
-                        className="flex-1 py-3 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-3 px-4 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2"
                       >
                         <span>Proceed to Payment ({session.price})</span>
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-4 h-4 shrink-0" />
                       </button>
                     </div>
                   </form>
@@ -863,8 +863,9 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         <span className="text-xs font-bold text-gray-800 mt-2.5">
                           Scan with PhonePe, GPay, or Paytm
                         </span>
-                        <span className="text-[11px] text-gray-500 mt-0.5">
-                          Account: <strong className="text-gray-900">{UPI_PAYEE_NAME}</strong>
+                        <span className="text-[11px] text-gray-500 mt-0.5 flex flex-col items-center gap-0.5">
+                          <span>Account: <strong className="text-gray-900">{UPI_PAYEE_NAME}</strong></span>
+                          <span>Number: <strong className="text-gray-900">{UPI_PHONE_NUMBER}</strong></span>
                         </span>
                       </div>
                     </div>
@@ -929,26 +930,11 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         )}
                       </div>
 
-                      {/* Optional UTR Number */}
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="upi-utr">
-                          UPI Ref / UTR Number (Optional)
-                        </label>
-                        <input
-                          id="upi-utr"
-                          type="text"
-                          value={paymentUtr}
-                          onChange={(e) => setPaymentUtr(e.target.value)}
-                          placeholder="e.g. 12-digit transaction ID"
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all"
-                        />
-                      </div>
-
-                      <div className="pt-3 flex items-center justify-between gap-4">
+                      <div className="pt-3 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                         <button
                           type="button"
                           onClick={() => setBookingStep("details")}
-                          className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:bg-gray-50"
+                          className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold hover:bg-gray-50 text-center"
                         >
                           Back
                         </button>
@@ -956,15 +942,15 @@ export function BookingDetailView({ session, onBack }: BookingDetailViewProps) {
                         <button
                           type="submit"
                           disabled={submitting || !paymentScreenshot}
-                          className="flex-1 py-3 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 py-3 px-4 rounded-full bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 text-white font-bold text-sm shadow-lg hover:shadow-pink-300/50 hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Send className="w-4 h-4" />
-                          <span>
+                          <Send className="w-4 h-4 shrink-0" />
+                          <span className="text-center">
                             {submitting
-                              ? "Verifying & Reserving..."
+                              ? "Verifying..."
                               : !paymentScreenshot
                               ? "Upload Screenshot to Confirm"
-                              : `Confirm & Complete Booking (${session.price})`}
+                              : `Confirm Booking (${session.price})`}
                           </span>
                         </button>
                       </div>
