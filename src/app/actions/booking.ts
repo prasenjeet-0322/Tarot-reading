@@ -42,6 +42,42 @@ export async function submitBooking(data: {
       return { success: false, error: result.error };
     }
 
+    // --- SEND TO TELEGRAM ---
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    if (botToken && chatId) {
+      const text = `🔮 *New Tarot Booking Received!* 🔮\n\n👤 *Name:* ${data.name}\n📱 *WhatsApp:* ${data.phone}\n📝 *Plan:* ${data.plan}\n📅 *Date:* ${data.bookingDate}\n⏰ *Time:* ${data.bookingTime}\n💰 *Amount:* ${data.amount}\n\n📋 *Notes/Insta:*\n${data.notes}`;
+      
+      try {
+        if (data.paymentScreenshot) {
+          const base64Data = data.paymentScreenshot.split(',')[1];
+          const buffer = Buffer.from(base64Data, 'base64');
+          const blob = new Blob([buffer], { type: 'image/jpeg' });
+          
+          const formData = new FormData();
+          formData.append('chat_id', chatId);
+          formData.append('caption', text);
+          formData.append('parse_mode', 'Markdown');
+          formData.append('photo', blob, 'screenshot.jpg');
+
+          await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+            method: 'POST',
+            body: formData,
+          });
+        } else {
+          await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' }),
+          });
+        }
+      } catch (err) {
+        console.error("Failed to send to Telegram:", err);
+      }
+    }
+    // ------------------------
+
     return { success: true, booking: result.record };
   } catch (error) {
     console.error("Booking error:", error);
